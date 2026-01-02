@@ -25,10 +25,6 @@ tags:
     description: Agent reviews
 
 paths:
-
-  # ============================
-  # AUTHENTICATION
-  # ============================
   /auth/register:
     post:
       tags: [Auth]
@@ -66,9 +62,6 @@ paths:
         "400": { description: Invalid request }
         "500": { description: Server error }
 
-  # ============================
-  # USERS
-  # ============================
   /users/me:
     get:
       tags: [Users]
@@ -99,9 +92,6 @@ paths:
         "401": { description: Unauthorized }
         "500": { description: Server error }
 
-  # ============================
-  # AGENTS
-  # ============================
   /agents:
     post:
       tags: [Agents]
@@ -186,9 +176,6 @@ paths:
         "404": { description: Agent not found }
         "500": { description: Server error }
 
-  # ============================
-  # PROPERTIES (IMMOBILI)
-  # ============================
   /properties:
     get:
       tags: [Properties]
@@ -201,8 +188,8 @@ paths:
         - $ref: '#/components/parameters/GeoLat'
         - $ref: '#/components/parameters/GeoLon'
         - $ref: '#/components/parameters/GeoRadius'
-        - $ref: '#/components/parameters/Page'  # Added
-        - $ref: '#/components/parameters/Limit' # Added
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
       responses:
         "200":
           description: List of properties
@@ -319,7 +306,6 @@ components:
 
   schemas:
 
-    # --- USER SCHEMAS ---
     User:
       type: object
       properties:
@@ -398,7 +384,6 @@ components:
         score: { type: integer, minimum: 1, maximum: 5 }
         comment: { type: string }
 
-    # --- PROPERTY SCHEMAS ---
     Property:
       type: object
       properties:
@@ -411,9 +396,9 @@ components:
            enum: [sale, rent]
         city: { type: string }
         rooms: { type: integer }
-        floor: { type: integer } # Added based on SQL
-        elevator: { type: boolean } # Added based on SQL
-        energyClass: { type: string } # Added based on SQL
+        floor: { type: integer } 
+        elevator: { type: boolean } 
+        energyClass: { type: string }
         latitude: { type: number }
         longitude: { type: number }
         amenities:
