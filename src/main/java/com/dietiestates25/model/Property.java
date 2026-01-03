@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import org.locationtech.jts.geom.Point;
 
 @Data
 @Entity
@@ -44,11 +45,8 @@ public class Property {
     @Column(length = 100)
     private String city;
 
-    @Column(precision = 10, scale = 7)
-    private BigDecimal latitude;
-
-    @Column(precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(name = "location", columnDefinition = "geography(Point, 4326)")
+    private Point location;
 
     @Column(name = "published_at", insertable = false, updatable = false)
     private LocalDateTime publishedAt;

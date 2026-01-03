@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 CREATE TABLE agency (
     id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
@@ -48,12 +50,13 @@ CREATE TABLE property (
     size_sqm INT,
     rooms INT,
     floor INT,
-    elevator BOOLEAN,
+    energy_class VARCHAR(5),
     energy_class VARCHAR(5),
     address VARCHAR(255),
     city VARCHAR(100),
-    latitude DECIMAL(10,7),
-    longitude DECIMAL(10,7),
+    
+    -- PostGIS Geometry column
+    location GEOGRAPHY(Point, 4326),
     
     published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     agent_id INT NOT NULL,
@@ -108,5 +111,4 @@ CREATE TABLE agent_evaluation (
 CREATE INDEX idx_property_city ON property(city);
 CREATE INDEX idx_property_price ON property(price);
 
-CREATE INDEX idx_property_lat ON property(latitude);
-CREATE INDEX idx_property_lon ON property(longitude);
+CREATE INDEX idx_property_location ON property USING GIST (location);
