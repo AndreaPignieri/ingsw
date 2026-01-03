@@ -7,7 +7,7 @@ CREATE TABLE agency (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "user" ( 
+CREATE TABLE users ( 
     id SERIAL PRIMARY KEY,
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255), -- NULL if login is OAuth only
@@ -28,7 +28,7 @@ CREATE TABLE user_role (
     user_id INT,
     role_id INT,
     PRIMARY KEY (user_id, role_id),
-    CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
@@ -36,7 +36,7 @@ CREATE TABLE agent (
     id INT PRIMARY KEY,
     biography TEXT,
     profile_photo VARCHAR(255),
-    CONSTRAINT fk_agent_user FOREIGN KEY (id) REFERENCES "user"(id) ON DELETE CASCADE
+    CONSTRAINT fk_agent_user FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE property (
@@ -90,7 +90,7 @@ CREATE TABLE external_account (
     provider_user_id VARCHAR(255) NOT NULL,
     user_id INT,
     UNIQUE (provider, provider_user_id),
-    CONSTRAINT fk_external_account_user FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
+    CONSTRAINT fk_external_account_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 
@@ -102,7 +102,7 @@ CREATE TABLE agent_evaluation (
     agent_id INT,
     user_id INT,
     CONSTRAINT fk_evaluation_agent FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE,
-    CONSTRAINT fk_evaluation_user FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE SET NULL
+    CONSTRAINT fk_evaluation_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_property_city ON property(city);
