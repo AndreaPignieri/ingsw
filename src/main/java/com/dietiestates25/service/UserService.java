@@ -20,17 +20,35 @@ public class UserService {
         return mapToDTO(user);
     }
 
+    @SuppressWarnings("null")
+    public UserDTO getUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        return mapToDTO(user);
+    }
+
     @Transactional
     @SuppressWarnings("null")
     public void updateUser(Long id, UserUpdateRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        updateUserFields(user, request);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @SuppressWarnings("null")
+    public void updateUser(String email, UserUpdateRequest request) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        updateUserFields(user, request);
+        userRepository.save(user);
+    }
+
+    private void updateUserFields(User user, UserUpdateRequest request) {
         if (request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
         if (request.getLastName() != null)
             user.setLastName(request.getLastName());
         if (request.getEmail() != null)
             user.setEmail(request.getEmail());
-        userRepository.save(user);
     }
 
     private UserDTO mapToDTO(User user) {

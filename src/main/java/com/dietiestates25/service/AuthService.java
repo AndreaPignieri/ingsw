@@ -23,7 +23,7 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new com.dietiestates25.exception.UserAlreadyExistsException("Email already registered");
         }
         User user = new User();
         user.setEmail(request.getEmail());
@@ -43,7 +43,7 @@ public class AuthService {
                         request.getPassword()));
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new com.dietiestates25.exception.ResourceNotFoundException("User not found"));
 
         // Use the authenticated principal directly
         var userDetails = (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
