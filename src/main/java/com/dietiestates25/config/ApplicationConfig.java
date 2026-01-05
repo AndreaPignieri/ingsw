@@ -27,7 +27,7 @@ public class ApplicationConfig {
                         user.getPasswordHash(),
                         user.getRoles().stream()
                                 .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
-                                        role.getName()))
+                                        role.name()))
                                 .collect(java.util.stream.Collectors.toList())))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

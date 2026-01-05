@@ -9,6 +9,11 @@ public class AgentCreateRequest {
     private String firstName;
     @NotBlank
     private String lastName;
+    @NotBlank
+    @jakarta.validation.constraints.Email
+    private String email;
+    @NotBlank
+    private String password;
     private String biography;
     private String profilePhoto;
 }
