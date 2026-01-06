@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-CREATE TABLE agency (
+CREATE TABLE IF NOT EXISTS agency (
     id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(150),
@@ -9,7 +9,7 @@ CREATE TABLE agency (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE users ( 
+CREATE TABLE IF NOT EXISTS users ( 
     id SERIAL PRIMARY KEY,
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255), -- NULL if login is OAuth only
@@ -21,12 +21,12 @@ CREATE TABLE users (
     CONSTRAINT fk_user_agency FOREIGN KEY (agency_id) REFERENCES agency(id) ON DELETE SET NULL
 );
 
-CREATE TABLE role (
+CREATE TABLE IF NOT EXISTS role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-CREATE TABLE user_role (
+CREATE TABLE IF NOT EXISTS user_role (
     user_id INT,
     role_id INT,
     PRIMARY KEY (user_id, role_id),
@@ -34,14 +34,14 @@ CREATE TABLE user_role (
     CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
-CREATE TABLE agent (
+CREATE TABLE IF NOT EXISTS agent (
     id INT PRIMARY KEY,
     biography TEXT,
     profile_photo VARCHAR(255),
     CONSTRAINT fk_agent_user FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE property (
+CREATE TABLE IF NOT EXISTS property (
     id SERIAL PRIMARY KEY,
     title VARCHAR(200),
     description TEXT,
@@ -50,7 +50,6 @@ CREATE TABLE property (
     size_sqm INT,
     rooms INT,
     floor INT,
-    energy_class VARCHAR(5),
     energy_class VARCHAR(5),
     address VARCHAR(255),
     city VARCHAR(100),
@@ -65,7 +64,7 @@ CREATE TABLE property (
     CONSTRAINT fk_property_agency FOREIGN KEY (agency_id) REFERENCES agency(id)
 );
 
-CREATE TABLE property_photo (
+CREATE TABLE IF NOT EXISTS property_photo (
     id SERIAL PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     display_order INT DEFAULT 0,
@@ -73,12 +72,12 @@ CREATE TABLE property_photo (
     CONSTRAINT fk_photo_property FOREIGN KEY (property_id) REFERENCES property(id) ON DELETE CASCADE
 );
 
-CREATE TABLE amenity (
+CREATE TABLE IF NOT EXISTS amenity (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE property_amenity (
+CREATE TABLE IF NOT EXISTS property_amenity (
     property_id INT,
     amenity_id INT,
     PRIMARY KEY (property_id, amenity_id),
@@ -87,7 +86,7 @@ CREATE TABLE property_amenity (
 );
 
 
-CREATE TABLE external_account (
+CREATE TABLE IF NOT EXISTS external_account (
     id SERIAL PRIMARY KEY,
     provider VARCHAR(50) NOT NULL,
     provider_user_id VARCHAR(255) NOT NULL,
@@ -97,7 +96,7 @@ CREATE TABLE external_account (
 );
 
 
-CREATE TABLE agent_evaluation (
+CREATE TABLE IF NOT EXISTS agent_evaluation (
     id SERIAL PRIMARY KEY,
     score INT CHECK (score BETWEEN 1 AND 5),
     comment TEXT,
@@ -108,7 +107,7 @@ CREATE TABLE agent_evaluation (
     CONSTRAINT fk_evaluation_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_property_city ON property(city);
-CREATE INDEX idx_property_price ON property(price);
+CREATE INDEX IF NOT EXISTS idx_property_city ON property(city);
+CREATE INDEX IF NOT EXISTS idx_property_price ON property(price);
 
-CREATE INDEX idx_property_location ON property USING GIST (location);
+CREATE INDEX IF NOT EXISTS idx_property_location ON property USING GIST (location);
