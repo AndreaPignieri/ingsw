@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build: ./server
     container_name: dietiestates-backend
     ports:
       - "8080:8080"
@@ -32,7 +32,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Initialize DB with schema.sql
-      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./server/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
