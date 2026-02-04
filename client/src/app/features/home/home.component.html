@@ -1,0 +1,35 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Find Your Perfect Home</h1>
+        <p>Discover the best properties for sale and rent in your area.</p>
+
+        <div class="search-box">
+            <div class="search-inputs">
+                <input type="text" [(ngModel)]="searchCity" placeholder="Enter city (e.g. Napoli)" class="form-input">
+                <select [(ngModel)]="searchType" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="SALE">For Sale</option>
+                    <option value="RENT">For Rent</option>
+                </select>
+                <button (click)="onSearch()" class="btn-search">Search</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section container">
+    <div class="section-header">
+        <h2>Featured Properties</h2>
+        <p>Check out our latest listings</p>
+    </div>
+
+    <div class="property-grid">
+        <app-property-card *ngFor="let property of featuredProperties" [property]="property">
+        </app-property-card>
+    </div>
+
+    <div *ngIf="featuredProperties.length === 0" class="empty-state">
+        <p>No featured properties found. <br> Be the first to list one!</p>
+    </div>
+
+</section>
