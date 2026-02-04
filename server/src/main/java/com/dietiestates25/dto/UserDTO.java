@@ -8,4 +8,8 @@ public class UserDTO {
     private String email;
     private String firstName;
     private String lastName;
+    private String role;
+    private String authProvider;
+    private String biography;
+    private String profilePhoto;
 }

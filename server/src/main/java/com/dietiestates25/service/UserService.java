@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @SuppressWarnings("null")
     public UserDTO getUser(Long id) {
@@ -49,6 +50,30 @@ public class UserService {
             user.setLastName(request.getLastName());
         if (request.getEmail() != null)
             user.setEmail(request.getEmail());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            if (request.getOldPassword() == null || request.getOldPassword().isEmpty()) {
+                throw new IllegalArgumentException("Old password is required to set a new password");
+            }
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+                throw new IllegalArgumentException("Old password does not match");
+            }
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        }
+
+        if (user instanceof com.dietiestates25.model.Agent) {
+            com.dietiestates25.model.Agent agent = (com.dietiestates25.model.Agent) user;
+            if (request.getBiography() != null) {
+                agent.setBiography(request.getBiography());
+            }
+            if (request.getProfilePhoto() != null) {
+                // Strip any query parameters (timestamp) before saving
+                String cleanUrl = request.getProfilePhoto();
+                if (cleanUrl.contains("?")) {
+                    cleanUrl = cleanUrl.substring(0, cleanUrl.indexOf("?"));
+                }
+                agent.setProfilePhoto(cleanUrl);
+            }
+        }
     }
 
     private UserDTO mapToDTO(User user) {
@@ -57,6 +82,14 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
+        dto.setRole(user.getRoles().stream().findFirst().map(Enum::name).orElse("USER"));
+        dto.setAuthProvider(user.getAuthProvider());
+
+        if (user instanceof com.dietiestates25.model.Agent) {
+            com.dietiestates25.model.Agent agent = (com.dietiestates25.model.Agent) user;
+            dto.setBiography(agent.getBiography());
+            dto.setProfilePhoto(agent.getProfilePhoto());
+        }
         return dto;
     }
 }

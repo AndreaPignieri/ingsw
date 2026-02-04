@@ -39,6 +39,10 @@ public class UserControllerTest {
     private com.dietiestates25.config.JwtAuthenticationFilter jwtAuthFilter;
     @MockBean
     private org.springframework.security.authentication.AuthenticationProvider authenticationProvider;
+    @MockBean
+    private com.dietiestates25.security.CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    @MockBean
+    private org.springframework.security.oauth2.client.registration.ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
     private ObjectMapper objectMapper;

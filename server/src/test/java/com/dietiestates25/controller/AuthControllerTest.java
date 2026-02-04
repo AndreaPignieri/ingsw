@@ -1,5 +1,6 @@
 package com.dietiestates25.controller;
 
+import com.dietiestates25.dto.AuthResponse;
 import com.dietiestates25.dto.LoginRequest;
 import com.dietiestates25.dto.RegisterRequest;
 import com.dietiestates25.service.AuthService;
@@ -12,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,6 +40,12 @@ public class AuthControllerTest {
 
     @MockBean
     private org.springframework.security.authentication.AuthenticationProvider authenticationProvider;
+
+    @MockBean
+    private com.dietiestates25.security.CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+
+    @MockBean
+    private org.springframework.security.oauth2.client.registration.ClientRegistrationRepository clientRegistrationRepository;
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() throws Exception {
@@ -100,14 +108,9 @@ public class AuthControllerTest {
         request.setEmail("test@example.com");
         request.setPassword("password123");
 
-        // Note: We don't need to mock return value strictly for status check unless we
-        // check body,
-        // but default mock returns null which might cause 200 OK with empty body or
-        // error depending on controller impl.
-        // Controller returns result of authService.login which returns AuthResponse.
         // Mocking it to be safe.
-        // when(authService.login(any(LoginRequest.class))).thenReturn(new
-        // AuthResponse("token", new UserDTO()));
+        when(authService.login(any(LoginRequest.class)))
+                .thenReturn(new AuthResponse("token", new com.dietiestates25.dto.UserDTO()));
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

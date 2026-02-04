@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final com.dietiestates25.repository.AgencyRepository agencyRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @org.springframework.transaction.annotation.Transactional
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new com.dietiestates25.exception.UserAlreadyExistsException("Email already registered");
@@ -32,6 +34,34 @@ public class AuthService {
         user.setLastName(request.getLastName());
 
         user.getRoles().add(com.dietiestates25.model.Role.USER);
+        user.setAuthProvider("LOCAL");
+
+        userRepository.save(user);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void registerAgency(AgencyRegisterRequest request) {
+        if (userRepository.existsByEmail(request.getManagerEmail())) {
+            throw new com.dietiestates25.exception.UserAlreadyExistsException("Email already registered");
+        }
+
+        // Create Agency
+        com.dietiestates25.model.Agency agency = new com.dietiestates25.model.Agency();
+        agency.setName(request.getAgencyName());
+        agency.setEmail(request.getAgencyEmail());
+        agency.setPhone(request.getAgencyPhone());
+        agency.setAddress(request.getAgencyAddress());
+        agency = agencyRepository.save(agency);
+
+        // Create Manager (User)
+        User user = new User();
+        user.setEmail(request.getManagerEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setFirstName(request.getManagerFirstName());
+        user.setLastName(request.getManagerLastName());
+        user.setAuthProvider("LOCAL");
+        user.setAgency(agency);
+        user.getRoles().add(com.dietiestates25.model.Role.AGENCY);
 
         userRepository.save(user);
     }
@@ -55,6 +85,8 @@ public class AuthService {
         userDTO.setEmail(user.getEmail());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
+        userDTO.setAuthProvider(user.getAuthProvider());
+        userDTO.setRole(user.getRoles().stream().findFirst().map(Enum::name).orElse("USER"));
 
         return new AuthResponse(token, userDTO);
     }

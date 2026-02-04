@@ -21,6 +21,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/register/agency")
+    public ResponseEntity<Void> registerAgency(@RequestBody @Valid AgencyRegisterRequest request) {
+        authService.registerAgency(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
