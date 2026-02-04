@@ -24,6 +24,23 @@ public class AgentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping
+    public ResponseEntity<java.util.List<AgentDTO>> getAllAgents(@RequestParam(required = false) Long agencyId) {
+        if (agencyId != null) {
+            return ResponseEntity.ok(agentService.getAgentsByAgency(agencyId));
+        }
+        return ResponseEntity.ok(agentService.getAllAgents());
+    }
+
+    @GetMapping("/my-agency")
+    @PreAuthorize("hasAuthority('AGENCY')")
+    public ResponseEntity<java.util.List<AgentDTO>> getMyAgents() {
+        String email = ((org.springframework.security.core.userdetails.UserDetails) org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal()).getUsername();
+
+        return ResponseEntity.ok(agentService.getAgentsByManagerEmail(email));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AgentDTO> getAgent(@PathVariable Long id) {
         return ResponseEntity.ok(agentService.getAgent(id));

@@ -1,10 +1,12 @@
 package com.dietiestates25.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "agent")
@@ -16,4 +18,10 @@ public class Agent extends User {
 
     @Column(name = "profile_photo", length = 255)
     private String profilePhoto;
+
+    @Column(name = "birth_date")
+    private java.time.LocalDate birthDate;
+
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
 }

@@ -26,8 +26,23 @@ class AgentServiceTest {
     @Mock
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
+    @Mock
+    private com.dietiestates25.repository.PropertyRepository propertyRepository;
+
     @InjectMocks
     private AgentService agentService;
+
+    @Mock
+    private com.dietiestates25.repository.UserRepository userRepository;
+
+    @Mock
+    private org.springframework.security.core.Authentication authentication;
+
+    @Mock
+    private org.springframework.security.core.context.SecurityContext securityContext;
+
+    @Mock
+    private org.springframework.security.core.userdetails.UserDetails userDetails;
 
     @Test
     void createAgent_ValidRequest_SavesAgent() {
@@ -37,12 +52,30 @@ class AgentServiceTest {
         request.setEmail("agent.smith@matrix.com");
         request.setPassword("neo");
 
+        // Mock Security Context
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn("manager@agency.com");
+        org.springframework.security.core.context.SecurityContextHolder.setContext(securityContext);
+
+        // Mock Manager and Agency
+        com.dietiestates25.model.User manager = new com.dietiestates25.model.User();
+        manager.setEmail("manager@agency.com");
+        com.dietiestates25.model.Agency agency = new com.dietiestates25.model.Agency();
+        agency.setId(10L);
+        manager.setAgency(agency);
+
+        when(userRepository.findByEmail("manager@agency.com")).thenReturn(Optional.of(manager));
         when(passwordEncoder.encode("neo")).thenReturn("encodedPassword");
 
         agentService.createAgent(request);
 
         verify(agentRepository).save(argThat(agent -> agent.getEmail().equals("agent.smith@matrix.com") &&
-                agent.getRoles().contains(com.dietiestates25.model.Role.AGENT)));
+                agent.getRoles().contains(com.dietiestates25.model.Role.AGENT) &&
+                agent.getAgency().getId().equals(10L)));
+
+        // Cleanup
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -53,6 +86,7 @@ class AgentServiceTest {
         agent.setFirstName("Bond");
 
         when(agentRepository.findById(id)).thenReturn(Optional.of(agent));
+        when(propertyRepository.findByAgentId(id)).thenReturn(java.util.Collections.emptyList());
 
         AgentDTO result = agentService.getAgent(id);
 
