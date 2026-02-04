@@ -135,12 +135,6 @@ class AuthServiceTest {
         request.setEmail("unknown@example.com");
         request.setPassword("password");
 
-        // Auth manager might indicate success if it was just checking logic, but
-        // usually it checks DB.
-        // In this architecture, if auth manager passes (maybe using a different
-        // provider?), but we check DB again.
-        // Assuming AuthManager mocks success:
-
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
 
         // Act & Assert
