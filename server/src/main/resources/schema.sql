@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(100),
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT TRUE,
+    auth_provider VARCHAR(50),
     agency_id INT,
     CONSTRAINT fk_user_agency FOREIGN KEY (agency_id) REFERENCES agency(id) ON DELETE SET NULL
 );
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS property (
     title VARCHAR(200),
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
-    type VARCHAR(20) NOT NULL CHECK (type IN ('sale', 'rent')),
+    type VARCHAR(20) NOT NULL CHECK (type IN ('SALE', 'RENT')),
     size_sqm INT,
     rooms INT,
     floor INT,

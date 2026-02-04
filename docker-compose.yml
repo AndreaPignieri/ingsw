@@ -1,11 +1,11 @@
-version: '3.8'
-
 services:
   app:
     build: ./server
     container_name: dietiestates-backend
     ports:
       - "8080:8080"
+    env_file:
+      - ./server/.env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/dietiestates
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -13,10 +13,24 @@ services:
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
-      - JWT_SECRET_KEY=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      - APP_FRONTEND_URL=
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - dietiestates-net
+
+  client:
+    build: ./client
+    container_name: dietiestates-frontend
+    ports:
+      - "4200:80"
+    volumes:
+      - ./uploads:/usr/share/nginx/html/uploads
+    depends_on:
+      - app
     networks:
       - dietiestates-net
 
