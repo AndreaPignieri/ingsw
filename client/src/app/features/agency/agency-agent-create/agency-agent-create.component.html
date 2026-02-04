@@ -1,0 +1,74 @@
+<div class="container page-content">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Create New Agent</h2>
+            <p>Add a new agent to your agency team.</p>
+        </div>
+
+        <div *ngIf="error" class="alert-error">
+            {{ error }}
+        </div>
+
+        <form [formGroup]="agentForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" formControlName="firstName" class="form-control" placeholder="e.g. Mario">
+                    <div *ngIf="agentForm.get('firstName')?.dirty && agentForm.get('firstName')?.invalid"
+                        class="error-text">
+                        First name is required.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" formControlName="lastName" class="form-control" placeholder="e.g. Rossi">
+                    <div *ngIf="agentForm.get('lastName')?.dirty && agentForm.get('lastName')?.invalid"
+                        class="error-text">
+                        Last name is required.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" formControlName="email" class="form-control" placeholder="e.g. mario@dieti.com">
+                    <div *ngIf="agentForm.get('email')?.dirty && agentForm.get('email')?.invalid" class="error-text">
+                        Valid email is required.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" formControlName="password" class="form-control" placeholder="******">
+                    <div *ngIf="agentForm.get('password')?.dirty && agentForm.get('password')?.invalid"
+                        class="error-text">
+                        Password must be at least 6 characters.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" formControlName="phoneNumber" class="form-control" placeholder="+39 ...">
+                </div>
+
+                <div class="form-group">
+                    <label>Birth Date</label>
+                    <input type="date" formControlName="birthDate" class="form-control">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Biography</label>
+                    <textarea formControlName="biography" class="form-control" rows="4"
+                        placeholder="Short bio..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="agentForm.invalid || isLoading">
+                    {{ isLoading ? 'Creating...' : 'Create Agent' }}
+                </button>
+                <a routerLink="/agency/dashboard" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

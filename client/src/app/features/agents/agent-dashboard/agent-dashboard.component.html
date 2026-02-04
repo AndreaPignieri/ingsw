@@ -1,0 +1,22 @@
+<div class="container dashboard-container">
+    <div class="dashboard-header">
+        <h1>Agent Dashboard</h1>
+    </div>
+
+    <section class="listings-section">
+        <div class="section-header">
+            <h2>My Listings ({{ myProperties.length }})</h2>
+            <a routerLink="/properties/create" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Add New
+            </a>
+        </div>
+        <div *ngIf="myProperties.length === 0" class="empty-state">
+            <p>You haven't listed any properties yet.</p>
+        </div>
+
+        <!-- Property Grid -->
+        <div class="properties-grid" *ngIf="myProperties.length > 0">
+            <app-property-card *ngFor="let property of myProperties" [property]="property"></app-property-card>
+        </div>
+    </section>
+</div>

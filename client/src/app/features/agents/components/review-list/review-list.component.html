@@ -1,0 +1,15 @@
+<div class="reviews-list">
+    <div class="review-card" *ngFor="let review of reviews">
+        <div class="review-header">
+            <div class="stars">
+                <span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= review.score">★</span>
+            </div>
+            <span class="user-name" *ngIf="review.userFullName">{{ review.userFullName }}</span>
+            <span class="date">{{ review.createdAt | date }}</span>
+        </div>
+        <p class="comment">{{ review.comment }}</p>
+    </div>
+    <div *ngIf="reviews.length === 0" class="no-reviews">
+        <p>No reviews yet. Be the first to review!</p>
+    </div>
+</div>

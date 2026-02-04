@@ -1,0 +1,16 @@
+<div class="review-form">
+    <h3>Write a Review</h3>
+
+    <div class="rating-input">
+        <span *ngFor="let star of [1,2,3,4,5]" (click)="setScore(star)" [class.filled]="star <= score">★</span>
+    </div>
+
+    <textarea [(ngModel)]="comment" placeholder="Share your experience working with this agent..." rows="4"
+        [disabled]="isSubmitting"></textarea>
+
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <button class="btn-submit" (click)="submitReview()" [disabled]="isSubmitting || !comment.trim()">
+        {{ isSubmitting ? 'Posting...' : 'Post Review' }}
+    </button>
+</div>

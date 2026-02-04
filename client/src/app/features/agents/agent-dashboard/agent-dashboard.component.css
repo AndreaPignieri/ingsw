@@ -1,0 +1,224 @@
+.dashboard-container {
+    padding: 2rem 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    text-align: center;
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    color: #1a237e;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-stats {
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(26, 35, 126, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 300px;
+    /* Don't stretch too wide since it is alone */
+    margin: 0 auto;
+    /* Center it */
+}
+
+.stat-number {
+    font-size: 4rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-card h3 {
+    display: none;
+    /* Hide old h3 in favor of stat-label class logic if needed, or just style h3 */
+}
+
+.listings-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #1a237e;
+    color: white;
+    box-shadow: 0 2px 8px rgba(26, 35, 126, 0.3);
+}
+
+.btn-primary:hover {
+    background: #283593;
+    transform: translateY(-1px);
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.stat-card h3 {
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin: 0;
+}
+
+.listings-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* New Section Header Styles */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: #111827;
+    margin: 0;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: #6b7280;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-outline {
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: white;
+    margin-top: 1rem;
+}
+
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}

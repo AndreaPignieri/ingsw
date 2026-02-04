@@ -1,0 +1,84 @@
+.page-content {
+    padding: 4rem 1.5rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.agent-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 2rem;
+    transition: transform 0.2s;
+}
+
+.agent-card:hover {
+    transform: translateY(-5px);
+}
+
+.agent-image {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #f3f4f6;
+}
+
+.agent-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.agent-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.bio {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-outline {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border: 2px solid #2563eb;
+    color: #2563eb;
+    border-radius: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: #2563eb;
+    color: white;
+}

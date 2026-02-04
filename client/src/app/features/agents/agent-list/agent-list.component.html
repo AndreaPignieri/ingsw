@@ -1,0 +1,19 @@
+<div class="container page-content">
+    <div class="header">
+        <h1>Our Agents</h1>
+        <p>Meet our team of professional real estate agents</p>
+    </div>
+
+    <div class="agent-grid">
+        <div class="agent-card" *ngFor="let agent of agents">
+            <div class="agent-image">
+                <img [src]="agent.profilePhoto || 'https://placehold.co/150'" [alt]="agent.firstName">
+            </div>
+            <div class="agent-info">
+                <h3>{{ agent.firstName }} {{ agent.lastName }}</h3>
+                <p class="bio">{{ agent.biography || 'Real Estate Agent' }}</p>
+                <a [routerLink]="['/agents', agent.id]" class="btn btn-outline">View Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
