@@ -26,7 +26,7 @@ services:
     build: ./client
     container_name: dietiestates-frontend
     ports:
-      - "4200:80"
+      - "80:80"
     volumes:
       - ./uploads:/usr/share/nginx/html/uploads
     depends_on:
