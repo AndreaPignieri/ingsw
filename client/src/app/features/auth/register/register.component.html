@@ -1,0 +1,233 @@
+<div class="auth-container">
+
+    <!-- Agency Registration Layout (Split Form) -->
+    <form *ngIf="isAgency" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-split-container">
+        <!-- Left Side: Agency Details -->
+        <div class="auth-form-side" style="background: #f8fafc; border-right: 1px solid #e2e8f0;">
+            <div class="auth-header" style="text-align: left; margin-bottom: 2rem;">
+                <h2>Agency Details</h2>
+                <p>Tell us about your business</p>
+            </div>
+
+            <div class="form-group">
+                <label for="agencyName">Agency Name</label>
+                <input id="agencyName" type="text" formControlName="agencyName" class="form-control"
+                    placeholder="Best Real Estate">
+                <div *ngIf="registerForm.get('agencyName')?.touched && registerForm.get('agencyName')?.invalid"
+                    class="error-message">
+                    Required
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="agencyEmail">Agency Email</label>
+                <input id="agencyEmail" type="email" formControlName="agencyEmail" class="form-control"
+                    placeholder="info@agency.com">
+                <div *ngIf="registerForm.get('agencyEmail')?.touched && registerForm.get('agencyEmail')?.invalid"
+                    class="error-message">
+                    Valid email required
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="agencyPhone">Agency Phone</label>
+                <input id="agencyPhone" type="tel" formControlName="agencyPhone" class="form-control"
+                    placeholder="+123456789">
+                <div *ngIf="registerForm.get('agencyPhone')?.touched && registerForm.get('agencyPhone')?.invalid"
+                    class="error-message">
+                    Required
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="agencyAddress">Agency Address</label>
+                <input id="agencyAddress" type="text" formControlName="agencyAddress" class="form-control"
+                    placeholder="123 Main St">
+                <div *ngIf="registerForm.get('agencyAddress')?.touched && registerForm.get('agencyAddress')?.invalid"
+                    class="error-message">
+                    Required
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Manager Details -->
+        <div class="auth-form-side">
+            <div class="auth-header" style="text-align: left; margin-bottom: 2rem;">
+                <h2>Manager Details</h2>
+                <p>Secure your administrative account</p>
+            </div>
+
+            <div class="name-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input id="firstName" type="text" formControlName="firstName" class="form-control"
+                        placeholder="John">
+                    <div *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid"
+                        class="error-message">
+                        <span *ngIf="registerForm.get('firstName')?.errors?.['required']">Required</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input id="lastName" type="text" formControlName="lastName" class="form-control" placeholder="Doe">
+                    <div *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid"
+                        class="error-message">
+                        <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Required</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input id="email" type="email" formControlName="email" class="form-control"
+                    placeholder="you@example.com">
+                <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+                    class="error-message">
+                    <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+                    <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" formControlName="password" class="form-control"
+                    placeholder="••••••••">
+                <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+                    class="error-message">
+                    <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+                    <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Must be at least 6
+                        characters</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control"
+                    placeholder="••••••••">
+                <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid"
+                    class="error-message">
+                    <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your
+                        password</span>
+                    <span *ngIf="registerForm.get('confirmPassword')?.errors?.['mismatch']">Passwords do not
+                        match</span>
+                </div>
+                <div *ngIf="registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched"
+                    class="error-message">
+                    Passwords do not match
+                </div>
+            </div>
+
+            <div *ngIf="error" class="alert-error" style="margin-bottom: 1rem;">
+                {{ error }}
+            </div>
+
+            <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isLoading">
+                {{ isLoading ? 'Registering...' : 'Complete Registration' }}
+            </button>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <a routerLink="/auth/register" [queryParams]="{}" class="link"
+                    style="font-size: 0.9em; color: #64748b;">← Cancel & Return</a>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Standard Customer Registration (Brand + Form) -->
+    <div *ngIf="!isAgency" class="auth-split-container">
+        <div class="auth-brand-side">
+            <div class="auth-brand-content">
+                <h2>Join DietiEstates25</h2>
+                <p>Create an account to find your next home.</p>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Join our community today</p>
+            </div>
+
+            <div *ngIf="error" class="alert-error">
+                {{ error }}
+            </div>
+
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <div class="name-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input id="firstName" type="text" formControlName="firstName" class="form-control"
+                            placeholder="John">
+                        <div *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid"
+                            class="error-message">
+                            <span *ngIf="registerForm.get('firstName')?.errors?.['required']">Required</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input id="lastName" type="text" formControlName="lastName" class="form-control"
+                            placeholder="Doe">
+                        <div *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid"
+                            class="error-message">
+                            <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Required</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input id="email" type="email" formControlName="email" class="form-control"
+                        placeholder="you@example.com">
+                    <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+                        class="error-message">
+                        <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+                        <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" formControlName="password" class="form-control"
+                        placeholder="••••••••">
+                    <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+                        class="error-message">
+                        <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+                        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Must be at least 6
+                            characters</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control"
+                        placeholder="••••••••">
+                    <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid"
+                        class="error-message">
+                        <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your
+                            password</span>
+                        <span *ngIf="registerForm.get('confirmPassword')?.errors?.['mismatch']">Passwords do not
+                            match</span>
+                    </div>
+                    <div *ngIf="registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched"
+                        class="error-message">
+                        Passwords do not match
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isLoading">
+                    {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a routerLink="/auth/login" class="link">Sign in</a></p>
+
+                <div class="separator" style="margin: 1.5rem 0;"></div>
+
+                <div class="mt-4" style="text-align: center;">
+                    <a routerLink="/auth/register" [queryParams]="{role: 'agency'}" class="btn-partner"
+                        style="width: 100%; justify-content: center; font-size: 1.1em; padding: 0.6rem;">
+                        Register New Agency
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
