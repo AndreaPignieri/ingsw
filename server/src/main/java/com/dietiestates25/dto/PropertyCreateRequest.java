@@ -18,6 +18,11 @@ public class PropertyCreateRequest {
     private String city;
     private Integer rooms;
     private Integer floor;
+    private Integer bathrooms;
+    private Integer sizeSqm;
+    private String address;
+    private String condition;
+    private Integer yearBuilt;
     private String energyClass;
     private BigDecimal latitude;
     private BigDecimal longitude;

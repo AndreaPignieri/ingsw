@@ -30,23 +30,31 @@ class PropertyServiceTest {
     @Mock
     private PropertyRepository propertyRepository;
 
+    @Mock
+    private com.dietiestates25.repository.AmenityRepository amenityRepository;
+
     @InjectMocks
     private PropertyService propertyService;
 
     // --- Search Tests ---
 
     @Test
+    @SuppressWarnings("null")
     void searchProperties_CallsRepo() {
         Page<Property> emptyPage = new PageImpl<>(Collections.emptyList());
         when(propertyRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(emptyPage);
 
-        Page<PropertyDTO> result = propertyService.searchProperties("Rome", null, null, null, 0, 10);
+        Page<PropertyDTO> result = propertyService.searchProperties("Rome", null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, 0, 10);
 
         assertNotNull(result);
         verify(propertyRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
     // --- Create Tests ---
+
+    @Mock
+    private com.dietiestates25.repository.AgentRepository agentRepository;
 
     @Test
     void createProperty_ValidData_SavesProperty() {
@@ -59,13 +67,21 @@ class PropertyServiceTest {
         request.setLatitude(BigDecimal.valueOf(40.85));
         request.setLongitude(BigDecimal.valueOf(14.26));
 
+        String agentEmail = "agent@test.com";
+        com.dietiestates25.model.Agent mockAgent = new com.dietiestates25.model.Agent();
+        mockAgent.setEmail(agentEmail);
+        com.dietiestates25.model.Agency mockAgency = new com.dietiestates25.model.Agency();
+        mockAgent.setAgency(mockAgency);
+
+        when(agentRepository.findByEmail(agentEmail)).thenReturn(Optional.of(mockAgent));
+
         when(propertyRepository.save(any(Property.class))).thenAnswer(i -> {
             Property p = i.getArgument(0);
             p.setId(1L);
             return p;
         });
 
-        PropertyDTO result = propertyService.createProperty(request);
+        PropertyDTO result = propertyService.createProperty(request, agentEmail);
 
         assertNotNull(result);
         assertEquals("Villa", result.getTitle());
@@ -78,8 +94,16 @@ class PropertyServiceTest {
         PropertyCreateRequest request = new PropertyCreateRequest();
         request.setType("INVALID_TYPE");
         request.setTitle("Fail");
+        String agentEmail = "agent@test.com";
 
-        assertThrows(RuntimeException.class, () -> propertyService.createProperty(request));
+        com.dietiestates25.model.Agent mockAgent = new com.dietiestates25.model.Agent();
+        mockAgent.setEmail(agentEmail);
+        com.dietiestates25.model.Agency mockAgency = new com.dietiestates25.model.Agency();
+        mockAgent.setAgency(mockAgency);
+
+        when(agentRepository.findByEmail(agentEmail)).thenReturn(Optional.of(mockAgent));
+
+        assertThrows(RuntimeException.class, () -> propertyService.createProperty(request, agentEmail));
     }
 
     // --- Get Tests ---

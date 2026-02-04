@@ -21,18 +21,33 @@ public class PropertyController {
     @GetMapping
     public ResponseEntity<Page<PropertyDTO>> searchProperties(
             @RequestParam(required = false) String city,
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Integer rooms,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) Integer floor,
+            @RequestParam(required = false) Integer bathrooms,
+            @RequestParam(required = false) String energyClass,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) String agentEmail,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double radius,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(propertyService.searchProperties(city, minPrice, maxPrice, rooms, page, limit));
+            @RequestParam(defaultValue = "12") int limit) {
+        return ResponseEntity
+                .ok(propertyService.searchProperties(city, type, minPrice, maxPrice, rooms, minSize, maxSize, floor,
+                        bathrooms, energyClass, condition, agentEmail, latitude, longitude, radius, page, limit));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('AGENT')")
-    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(propertyService.createProperty(request));
+    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyCreateRequest request,
+            java.security.Principal principal) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(propertyService.createProperty(request, principal.getName()));
     }
 
     @GetMapping("/{id}")

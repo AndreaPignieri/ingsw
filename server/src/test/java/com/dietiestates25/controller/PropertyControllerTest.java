@@ -38,6 +38,12 @@ public class PropertyControllerTest {
         @MockBean
         private org.springframework.security.authentication.AuthenticationProvider authenticationProvider;
 
+        @MockBean
+        private com.dietiestates25.security.CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+
+        @MockBean
+        private org.springframework.security.oauth2.client.registration.ClientRegistrationRepository clientRegistrationRepository;
+
         @org.junit.jupiter.api.BeforeEach
         void setUp() throws Exception {
                 org.mockito.Mockito.doAnswer(invocation -> {
@@ -66,7 +72,8 @@ public class PropertyControllerTest {
                                 org.springframework.data.domain.PageRequest.of(0, 10),
                                 properties.size());
 
-                when(propertyService.searchProperties(any(), any(), any(), any(), anyInt(), anyInt()))
+                when(propertyService.searchProperties(any(), any(), any(), any(), any(), any(), any(), any(), any(),
+                                any(), any(), any(), any(), any(), any(), anyInt(), anyInt()))
                                 .thenReturn(mockPage);
 
                 mockMvc.perform(get("/properties")

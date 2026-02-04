@@ -1,19 +1,24 @@
 package com.dietiestates25.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import org.locationtech.jts.geom.Point;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "property")
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(length = 200)
@@ -34,6 +39,13 @@ public class Property {
 
     private Integer rooms;
     private Integer floor;
+    private Integer bathrooms;
+
+    @Column(name = "property_condition", length = 50)
+    private String condition;
+
+    @Column(name = "year_built")
+    private Integer yearBuilt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "energy_class", length = 5)

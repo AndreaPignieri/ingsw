@@ -13,4 +13,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
         @Query(value = "SELECT p FROM Property p WHERE ST_Distance(p.location, :point) < :radiusInMeters")
         Page<Property> findByLocationNear(@Param("point") org.locationtech.jts.geom.Point point,
                         @Param("radiusInMeters") double radiusInMeters, Pageable pageable);
+
+        java.util.List<Property> findByAgentId(Long agentId);
 }
