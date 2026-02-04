@@ -1,0 +1,103 @@
+<div class="container page-content" *ngIf="property; else loadingOrError">
+
+    <div class="gallery-section">
+        <div class="main-image">
+            <img [src]="property.photos?.[activeImageIndex] || 'assets/placeholder-property.jpg'"
+                [alt]="property.title">
+            <span class="badge" [class.rent]="property.type === 'RENT'">{{ property.type | titlecase }}</span>
+
+            <!-- Navigation Arrows -->
+            <button class="nav-btn prev" (click)="prevImage()" *ngIf="property.photos && property.photos.length > 1">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="nav-btn next" (click)="nextImage()" *ngIf="property.photos && property.photos.length > 1">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Image Counter -->
+            <div class="image-counter" *ngIf="property.photos && property.photos.length > 1">
+                {{ activeImageIndex + 1 }} / {{ property.photos.length }}
+            </div>
+        </div>
+
+        <div class="thumbnails" *ngIf="property.photos && property.photos.length > 1">
+            <img *ngFor="let photo of property.photos; let i = index" [src]="photo"
+                [class.active]="i === activeImageIndex" (click)="setActiveImage(i)">
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div class="header">
+            <h1 class="title">{{ property.title }}</h1>
+            <p class="price">€{{ property.price | number }}</p>
+            <p class="location"><i class="fas fa-map-marker-alt"></i> {{ property.address ? property.address + ', ' : ''
+                }}{{ property.city }}</p>
+        </div>
+
+        <div class="main-features">
+            <div class="feature-item">
+                <span class="label">Size</span>
+                <span class="value">{{ property.sizeSqm ? property.sizeSqm + ' m²' : '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Rooms</span>
+                <span class="value">{{ property.rooms || '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Floor</span>
+                <span class="value">{{ property.floor || '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Bathrooms</span>
+                <span class="value">{{ property.bathrooms || '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Condition</span>
+                <span class="value">{{ property.condition || '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Year</span>
+                <span class="value">{{ property.yearBuilt || '-' }}</span>
+            </div>
+            <div class="feature-item">
+                <span class="label">Energy</span>
+                <span class="value">{{ property.energyClass || '-' }}</span>
+            </div>
+        </div>
+
+        <div class="description-box">
+            <h3>Description</h3>
+            <p>{{ property.description || 'No description available.' }}</p>
+        </div>
+
+        <div class="amenities-box" *ngIf="property.amenities && property.amenities.length">
+            <h3>Amenities</h3>
+            <div class="amenities-grid">
+                <span class="amenity-tag" *ngFor="let amenity of property.amenities">{{ amenity }}</span>
+            </div>
+        </div>
+
+        <div class="action-box">
+            <div class="agent-info" *ngIf="property.agentName">
+                <h3>Listed by</h3>
+                <p class="agent-name">{{ property.agentName }}</p>
+                <p class="agency-name" *ngIf="property.agencyName">{{ property.agencyName }}</p>
+            </div>
+
+            <a [routerLink]="['/agents', property.agentId]" class="btn btn-primary w-100" *ngIf="property.agentId">
+                Contact Agent
+            </a>
+            <button class="btn btn-disabled w-100" *ngIf="!property.agentId" disabled>
+                Contact Agent Unavailable
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<ng-template #loadingOrError>
+    <div class="container loading-container">
+        <p *ngIf="isLoading">Loading property details...</p>
+        <p *ngIf="error" class="error-text">{{ error }}</p>
+    </div>
+</ng-template>

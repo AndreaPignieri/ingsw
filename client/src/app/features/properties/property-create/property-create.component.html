@@ -1,0 +1,177 @@
+<div class="container page-content">
+    <div class="create-property-wrapper">
+        <div class="header-section">
+            <h1>Create New Property</h1>
+            <p class="subtitle">List a new property for sale or rent</p>
+        </div>
+
+        <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()" class="property-form">
+
+            <!-- Basic Info -->
+            <section class="form-section">
+                <h3>Basic Information</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>Title <span class="required">*</span></label>
+                        <input type="text" formControlName="title" class="form-control"
+                            placeholder="e.g. Luxury Apartment in City Center">
+                        <div class="error-msg"
+                            *ngIf="propertyForm.get('title')?.touched && propertyForm.get('title')?.invalid">
+                            Title is required
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type <span class="required">*</span></label>
+                        <select formControlName="type" class="form-control">
+                            <option *ngFor="let type of propertyTypes" [value]="type">{{ type | titlecase }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price <span class="required">*</span></label>
+                        <div class="price-wrapper">
+                            <span class="currency-symbol">€</span>
+                            <input type="text" [value]="displayPrice" (input)="onPriceInput($event)"
+                                class="form-control price-input" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Description <span class="optional">(Optional)</span></label>
+                    <textarea formControlName="description" class="form-control" rows="4"
+                        placeholder="Describe the property..."></textarea>
+                </div>
+            </section>
+
+            <!-- Location -->
+            <section class="form-section">
+                <h3>Location</h3>
+
+                <div class="form-group full-width">
+                    <label>Search Address <span class="required">*</span></label>
+                    <input #addressSearch type="text" class="form-control" placeholder="Start typing address..."
+                        (keydown.enter)="$event.preventDefault()">
+                </div>
+
+                <!-- Hidden City/Address Fields (Populated by Map/Search) -->
+                <!-- We keep them in the form group but don't show them to user -->
+
+                <div class="form-group full-width">
+                    <label>Map Location <span class="required">*</span></label>
+                    <div class="map-picker-container" style="height: 400px; margin-bottom: 1rem;">
+                        <app-map-search mode="pick" [center]="mapLocation ? mapLocation : {lat: 41.9028, lng: 12.4964}"
+                            [pickedLocation]="mapLocation" [radius]="0" (locationPick)="onLocationPicked($event)">
+                        </app-map-search>
+                    </div>
+
+                    <!-- Hidden Latitude/Longitude Fields -->
+                    <div class="form-row" style="display: none;">
+                        <div class="form-group">
+                            <label>Latitude</label>
+                            <input type="number" formControlName="latitude" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Longitude</label>
+                            <input type="number" formControlName="longitude" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="error-msg"
+                        *ngIf="propertyForm.get('latitude')?.touched && propertyForm.get('latitude')?.invalid">
+                        Location is required. Please search for an address or pick a location on the map.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Details -->
+            <section class="form-section">
+                <h3>Property Details</h3>
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label>Size (m²) <span class="required">*</span></label>
+                        <input type="number" formControlName="sizeSqm" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Rooms <span class="required">*</span></label>
+                        <input type="number" formControlName="rooms" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Bathrooms <span class="required">*</span></label>
+                        <input type="number" formControlName="bathrooms" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label>Floor <span class="required">*</span></label>
+                        <input type="number" formControlName="floor" class="form-control">
+                    </div>
+                    <!-- Year Built Removed -->
+                    <div class="form-group">
+                        <label>Condition <span class="required">*</span></label>
+                        <input type="text" formControlName="condition" class="form-control"
+                            placeholder="e.g. New, Renovated">
+                    </div>
+                    <div class="form-group">
+                        <label>Energy Class <span class="required">*</span></label>
+                        <select formControlName="energyClass" class="form-control">
+                            <option value="">Select...</option>
+                            <option value="A4">A4</option>
+                            <option value="A3">A3</option>
+                            <option value="A2">A2</option>
+                            <option value="A1">A1</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="G">G</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Amenities -->
+            <section class="form-section">
+                <h3>Amenities <span class="optional">(Optional)</span></h3>
+                <div class="amenities-grid">
+                    <div class="amenity-item" *ngFor="let amenity of availableAmenities">
+                        <input type="checkbox" [id]="amenity" (change)="onAmenityChange($event, amenity)">
+                        <label [for]="amenity">{{ amenity }}</label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Photos -->
+            <section class="form-section">
+                <h3>Photos <span class="optional">(Optional)</span></h3>
+
+                <div class="photo-upload-area">
+                    <label class="upload-dropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Click to upload photos</span>
+                        <input type="file" multiple accept="image/*" (change)="onFileSelected($event)" hidden>
+                    </label>
+                </div>
+
+                <div class="photo-grid" *ngIf="photoUrls.controls.length > 0 || uploadingPhotos">
+                    <div class="photo-item" *ngFor="let photoControl of photoUrls.controls; let i = index">
+                        <img [src]="photoControl.value" class="photo-thumbnail">
+                        <button type="button" class="btn-remove-photo" (click)="removePhoto(i)">✕</button>
+                    </div>
+
+                    <div class="photo-item uploading" *ngIf="uploadingPhotos">
+                        <div class="spinner"></div> <!-- Simple spinner placeholder -->
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">Create Property</button>
+                <p *ngIf="error" class="error-text">{{ error }}</p>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+<div class="container page-content">
+    <!-- Sidebar Filters -->
+    <aside class="filters-sidebar">
+        <div class="filters-header">
+            <h3>Filters</h3>
+            <button class="btn-text" (click)="clearFilters()">Clear all</button>
+        </div>
+        <div class="filter-group">
+            <label>Location (City)</label>
+            <input type="text" [(ngModel)]="filters.city" (change)="onFilterChange()" placeholder="e.g. Rome"
+                class="form-control">
+        </div>
+
+        <div class="filter-group">
+            <label>Contract Type</label>
+            <select [(ngModel)]="filters.type" (change)="onFilterChange()" class="form-control">
+                <option [ngValue]="undefined">Any</option>
+                <option value="SALE">Sale</option>
+                <option value="RENT">Rent</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Price Range (€)</label>
+            <app-dual-range-slider [min]="0" [max]="2000000" [step]="10000" [(currentMin)]="filters.minPrice"
+                [(currentMax)]="filters.maxPrice" [formatValue]="formatPrice" (changeEnd)="onFilterChange()">
+            </app-dual-range-slider>
+        </div>
+
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Rooms ({{ filters.rooms || 'Any' }}+)</label>
+                <div class="counter-input">
+                    <button class="btn-counter" (click)="decrementRooms()">-</button>
+                    <input type="text" [value]="filters.rooms || 'Any'" readonly class="form-control text-center">
+                    <button class="btn-counter" (click)="incrementRooms()">+</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Bathrooms ({{ filters.bathrooms || 'Any' }}+)</label>
+                <div class="counter-input">
+                    <button class="btn-counter" (click)="decrementBathrooms()">-</button>
+                    <input type="text" [value]="filters.bathrooms || 'Any'" readonly class="form-control text-center">
+                    <button class="btn-counter" (click)="incrementBathrooms()">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Size (sqm)</label>
+            <app-dual-range-slider [min]="0" [max]="500" [step]="10" [(currentMin)]="filters.minSize"
+                [(currentMax)]="filters.maxSize" [formatValue]="formatSize" (changeEnd)="onFilterChange()">
+            </app-dual-range-slider>
+        </div>
+
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Floor</label>
+                <input type="number" [(ngModel)]="filters.floor" (change)="onFilterChange()" placeholder="Any"
+                    class="form-control">
+            </div>
+
+            <div class="filter-group">
+                <label>Energy Class</label>
+                <select [(ngModel)]="filters.energyClass" (change)="onFilterChange()" class="form-control">
+                    <option [ngValue]="undefined">Any</option>
+                    <option value="A4">A4</option>
+                    <option value="A3">A3</option>
+                    <option value="A2">A2</option>
+                    <option value="A1">A1</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="G">G</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Condition</label>
+            <select [(ngModel)]="filters.condition" (change)="onFilterChange()" class="form-control">
+                <option [ngValue]="undefined">Any</option>
+                <option value="New">New</option>
+                <option value="Excellent">Excellent</option>
+                <option value="Good">Good</option>
+                <option value="Needs Renovation">Needs Renovation</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary w-100" (click)="onFilterChange()">Apply Filters</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="property-results">
+        <div class="results-header">
+            <h2>Properties</h2>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-spinner">
+            Loading...
+        </div>
+
+        <div *ngIf="!isLoading && properties.length === 0" class="no-results">
+            <p>No properties found matching your criteria.</p>
+        </div>
+
+        <!-- Property Grid -->
+        <div class="property-grid" *ngIf="!isLoading && properties.length > 0">
+            <app-property-card *ngFor="let property of properties" [property]="property">
+            </app-property-card>
+        </div>
+
+        <!-- Map Section (Always Visible) -->
+        <div class="map-section">
+            <h3>Map View</h3>
+            <div class="map-view-container" style="height: 500px; margin-bottom: 20px;">
+                <app-map-search [properties]="allProperties"
+                    [center]="filters.latitude ? {lat: filters.latitude, lng: filters.longitude!} : {lat: 41.9028, lng: 12.4964}"
+                    [radius]="filters.radius || 5000" (searchAreaChange)="onMapSearch($event)">
+                </app-map-search>
+            </div>
+        </div>
+    </main>
+</div>
