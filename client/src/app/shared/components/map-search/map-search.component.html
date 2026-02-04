@@ -1,0 +1,39 @@
+<div class="map-wrapper">
+    <google-map height="100%" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions"
+        (mapClick)="onMapClick($event)">
+
+        <!-- Search Radius Circle (Only in search mode) -->
+        <map-circle *ngIf="isSearchActive && mode === 'search'" [center]="center" [radius]="radius"
+            [options]="circleOptions" (radiusChanged)="onCircleEvent()" (centerChanged)="onCircleEvent()">
+        </map-circle>
+
+        <!-- Property Markers (Search mode) -->
+        <map-marker *ngFor="let marker of markers" [position]="marker.position" [title]="marker.title"
+            (mapClick)="openInfoWindow(markerRef, marker.data)" #markerRef="mapMarker">
+        </map-marker>
+
+        <!-- Picked Location Marker (Pick mode) -->
+        <map-marker *ngIf="pickedMarker && mode === 'pick'" [position]="pickedMarker.position"
+            [title]="pickedMarker.title">
+        </map-marker>
+
+        <map-info-window>
+            <div *ngIf="selectedProperty" class="info-window-content">
+                <h5>{{ selectedProperty.title }}</h5>
+                <p class="price">{{ selectedProperty.price | currency:'EUR':'symbol':'1.0-0' }}</p>
+                <p>{{ selectedProperty.city }}</p>
+                <small style="cursor: pointer; color: blue; text-decoration: underline;"
+                    (click)="goToDetails(selectedProperty)">
+                    Click to view details
+                </small>
+            </div>
+        </map-info-window>
+
+    </google-map>
+    <div class="map-help-text" *ngIf="mode === 'search'">
+        Click on map to circle search area. Use slider to adjust radius.
+    </div>
+    <div class="map-help-text" *ngIf="mode === 'pick'">
+        Click on the map or search to set the location.
+    </div>
+</div>

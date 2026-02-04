@@ -1,0 +1,18 @@
+<div class="dual-slider-container">
+    <div class="range-values">
+        <span class="value-box min-value">{{ formatValue(minValue) }}</span>
+        <span class="separator">-</span>
+        <span class="value-box max-value">{{ formatValue(maxValue) }}</span>
+    </div>
+
+    <div class="slider-controls">
+        <div class="slider-track-bg"></div>
+        <div class="slider-track-fill" [style.left.%]="minPercent" [style.right.%]="100 - maxPercent"></div>
+
+        <input type="range" [min]="min" [max]="max" [step]="step" [(ngModel)]="minValue" (input)="onMinChange()"
+            (change)="onChangeEnd()" class="range-input min-range">
+
+        <input type="range" [min]="min" [max]="max" [step]="step" [(ngModel)]="maxValue" (input)="onMaxChange()"
+            (change)="onChangeEnd()" class="range-input max-range">
+    </div>
+</div>

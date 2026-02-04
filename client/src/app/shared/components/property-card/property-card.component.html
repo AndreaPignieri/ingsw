@@ -1,0 +1,20 @@
+<div class="property-card">
+    <div class="card-image">
+        <img [src]="property.photos?.[0] || 'assets/placeholder-property.jpg'" [alt]="property.title"
+            onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+        <span class="badge" [class.rent]="property.type === 'RENT'">{{ property.type | titlecase }}</span>
+    </div>
+    <div class="card-content">
+        <h3 class="card-title">{{ property.title }}</h3>
+        <p class="card-price">€{{ property.price | number }}</p>
+        <p class="card-location">
+            <i class="fas fa-map-marker-alt"></i> {{ property.city }}
+        </p>
+        <div class="card-features">
+            <span *ngIf="property.sizeSqm">{{ property.sizeSqm }} m²</span>
+            <span>{{ property.rooms }} Beds</span>
+            <span *ngIf="property.bathrooms">{{ property.bathrooms }} Baths</span>
+        </div>
+        <a [routerLink]="['/properties', property.id]" class="btn-details">View Details</a>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<nav class="navbar">
+  <div class="container">
+    <a routerLink="/" class="brand">DietiEstates25</a>
+
+    <button class="mobile-toggle" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <div class="nav-links" [class.active]="isMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/properties" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Properties</a>
+      <a routerLink="/agents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Agents</a>
+      <a *ngIf="authService.isAgent()" routerLink="/agents/dashboard" routerLinkActive="active">Dashboard</a>
+      <a *ngIf="authService.isAgency()" routerLink="/agency/dashboard" routerLinkActive="active">Dashboard</a>
+
+      <div class="auth-buttons">
+        <ng-container *ngIf="!(authService.getToken()); else loggedIn">
+          <a routerLink="/auth/login" class="btn btn-text">Login</a>
+          <a routerLink="/auth/register" (click)="navigateToRegister()" class="btn btn-primary">Sign Up</a>
+        </ng-container>
+        <ng-template #loggedIn>
+          <a routerLink="/profile" class="btn btn-profile">My Profile</a>
+          <button (click)="authService.logout()" class="btn btn-text">Logout</button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</nav>
