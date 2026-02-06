@@ -100,12 +100,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             isLocality: !!isLocality
         };
 
-        // If it's a locality, we still just use the name for searchCity
         if (isLocality) {
             this.searchCity = place.name || '';
         } else {
-            // For address, we might want to clear the city text or keep it
-            // We'll keep the text for display but use coords for search
             this.searchCity = this.citySearchInput.nativeElement.value;
         }
     }
@@ -116,22 +113,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.searchType) queryParams.type = this.searchType;
 
         if (this.selectedLocation) {
-            // We have a Google Maps selection
             if (this.selectedLocation.isLocality) {
-                // It's a city -> Filter by Name + Center Map
                 queryParams.city = this.searchCity;
                 queryParams.latitude = this.selectedLocation.lat;
                 queryParams.longitude = this.selectedLocation.lng;
-                // No radius -> Global city search
             } else {
-                // It's an address -> Filter by Radius
                 queryParams.latitude = this.selectedLocation.lat;
                 queryParams.longitude = this.selectedLocation.lng;
                 queryParams.radius = 5000;
-                // No city filter -> Properties near address
             }
         } else {
-            // Text only search (user didn't pick from autocomplete, or typed and hit enter)
             if (this.searchCity) queryParams.city = this.searchCity;
         }
 
