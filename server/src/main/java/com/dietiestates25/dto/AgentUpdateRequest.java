@@ -8,4 +8,6 @@ public class AgentUpdateRequest {
     private String lastName;
     private String biography;
     private String profilePhoto;
+    private java.time.LocalDate birthDate;
+    private String phoneNumber;
 }

@@ -104,6 +104,10 @@ public class AgentService {
             agent.setBiography(request.getBiography());
         if (request.getProfilePhoto() != null)
             agent.setProfilePhoto(request.getProfilePhoto());
+        if (request.getBirthDate() != null)
+            agent.setBirthDate(request.getBirthDate());
+        if (request.getPhoneNumber() != null)
+            agent.setPhoneNumber(request.getPhoneNumber());
         agentRepository.save(agent);
     }
 

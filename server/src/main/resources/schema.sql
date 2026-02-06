@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS agent (
     id INT PRIMARY KEY,
     biography TEXT,
     profile_photo VARCHAR(255),
+    birth_date DATE,
+    phone_number VARCHAR(20),
     CONSTRAINT fk_agent_user FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
