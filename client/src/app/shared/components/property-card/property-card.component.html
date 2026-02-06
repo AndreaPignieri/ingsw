@@ -12,7 +12,7 @@
         </p>
         <div class="card-features">
             <span *ngIf="property.sizeSqm">{{ property.sizeSqm }} m²</span>
-            <span>{{ property.rooms }} Beds</span>
+            <span>{{ property.rooms }} Rooms</span>
             <span *ngIf="property.bathrooms">{{ property.bathrooms }} Baths</span>
         </div>
         <a [routerLink]="['/properties', property.id]" class="btn-details">View Details</a>
