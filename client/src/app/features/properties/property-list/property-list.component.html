@@ -6,9 +6,9 @@
             <button class="btn-text" (click)="clearFilters()">Clear all</button>
         </div>
         <div class="filter-group">
-            <label>Location (City)</label>
-            <input type="text" [(ngModel)]="filters.city" (change)="onFilterChange()" placeholder="e.g. Rome"
-                class="form-control">
+            <label>Location</label>
+            <input #citySearch type="text" [(ngModel)]="filters.city" (change)="onFilterChange()"
+                (keydown.enter)="$event.preventDefault()" placeholder="e.g. Rome" class="form-control">
         </div>
 
         <div class="filter-group">

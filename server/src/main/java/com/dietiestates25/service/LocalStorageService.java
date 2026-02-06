@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "storage.type", havingValue = "local", matchIfMissing = true)
 public class LocalStorageService implements StorageService {
 
     private final Path rootLocation = Paths.get("uploads").toAbsolutePath().normalize();

@@ -5,7 +5,8 @@
 
         <div class="search-box">
             <div class="search-inputs">
-                <input type="text" [(ngModel)]="searchCity" placeholder="Enter city (e.g. Napoli)" class="form-input">
+                <input #citySearch type="text" [(ngModel)]="searchCity" (keydown.enter)="onSearch()"
+                    placeholder="Enter Location (e.g. Napoli)" class="form-input">
                 <select [(ngModel)]="searchType" class="form-select">
                     <option value="">All Types</option>
                     <option value="SALE">For Sale</option>
