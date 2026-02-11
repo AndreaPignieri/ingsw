@@ -106,34 +106,32 @@ public class AgentService {
     }
 
     private AgentDTO mapToDTO(Agent agent) {
-        try {
-            AgentDTO dto = new AgentDTO();
-            dto.setId(agent.getId());
-            dto.setFirstName(agent.getFirstName());
-            dto.setLastName(agent.getLastName());
-            dto.setEmail(agent.getEmail());
-            dto.setBiography(agent.getBiography());
-            dto.setProfilePhoto(agent.getProfilePhoto());
-            dto.setBirthDate(agent.getBirthDate());
-            dto.setPhoneNumber(agent.getPhoneNumber());
 
-            if (agent.getAgency() != null) {
-                dto.setAgencyName(agent.getAgency().getName());
-            }
+        AgentDTO dto = new AgentDTO();
+        dto.setId(agent.getId());
+        dto.setFirstName(agent.getFirstName());
+        dto.setLastName(agent.getLastName());
+        dto.setEmail(agent.getEmail());
+        dto.setBiography(agent.getBiography());
+        dto.setProfilePhoto(agent.getProfilePhoto());
+        dto.setBirthDate(agent.getBirthDate());
+        dto.setPhoneNumber(agent.getPhoneNumber());
 
-            var properties = propertyRepository.findByAgentId(agent.getId());
-
-            if (properties != null) {
-                dto.setProperties(
-                        properties.stream().map(this::mapPropertyToDTO).collect(java.util.stream.Collectors.toList()));
-            } else {
-                dto.setProperties(new java.util.ArrayList<>());
-            }
-
-            return dto;
-        } catch (Exception e) {
-            throw e;
+        if (agent.getAgency() != null) {
+            dto.setAgencyName(agent.getAgency().getName());
         }
+
+        var properties = propertyRepository.findByAgentId(agent.getId());
+
+        if (properties != null) {
+            dto.setProperties(
+                    properties.stream().map(this::mapPropertyToDTO).collect(java.util.stream.Collectors.toList()));
+        } else {
+            dto.setProperties(new java.util.ArrayList<>());
+        }
+
+        return dto;
+
     }
 
     private com.dietiestates25.dto.PropertyDTO mapPropertyToDTO(com.dietiestates25.model.Property property) {
