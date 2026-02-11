@@ -33,33 +33,39 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // Extract attributes based on provider (safe fallback)
+        String email = extractEmail(oAuth2User);
+        String[] names = extractNames(oAuth2User);
+        String firstName = names[0];
+        String lastName = names[1];
+
+        User user = findOrCreateUser(email, firstName, lastName, authentication);
+        String token = createToken(user);
+
+        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/auth/login?token=" + token);
+    }
+
+    private String extractEmail(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String login = oAuth2User.getAttribute("login"); // GitHub specific
+        String login = oAuth2User.getAttribute("login");
 
-        // GitHub might not return email if private, use login or fallback
-        if (email == null) {
-            if (login != null) {
-                email = login + "@github.com"; // Placeholder email for GitHub users without public email
-            } else {
-                email = "user_" + UUID.randomUUID().toString().substring(0, 8) + "@oauth.com";
-            }
+        if (email != null) {
+            return email;
         }
+        if (login != null) {
+            return login + "@github.com";
+        }
+        return "user_" + UUID.randomUUID().toString().substring(0, 8) + "@oauth.com";
+    }
 
-        String firstName = null;
-        String lastName = null;
-
-        // Try standard OpenID attributes first
+    private String[] extractNames(OAuth2User oAuth2User) {
+        String name = oAuth2User.getAttribute("name");
+        String login = oAuth2User.getAttribute("login");
         String givenName = oAuth2User.getAttribute("given_name");
         String familyName = oAuth2User.getAttribute("family_name");
 
-        if (givenName != null)
-            firstName = givenName;
-        if (familyName != null)
-            lastName = familyName;
+        String firstName = givenName;
+        String lastName = familyName;
 
-        // If split names missing, try to parse full name
         if (firstName == null && name != null) {
             String[] parts = name.split(" ", 2);
             if (parts.length > 0)
@@ -68,63 +74,61 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 lastName = parts[1];
         }
 
-        // Fallback for GitHub (often just has 'name' or 'login')
         if (firstName == null && login != null) {
             firstName = login;
         }
 
-        // Final safe defaults
         if (firstName == null)
             firstName = "User";
         if (lastName == null)
             lastName = "";
 
-        final String finalFirstName = firstName;
-        final String finalLastName = lastName;
-        final String finalEmail = email;
+        return new String[] { firstName, lastName };
+    }
 
-        User user = userRepository.findByEmail(finalEmail).map(existingUser -> {
-            // Update name if we have better info now
-            boolean updated = false;
-            // Only update if existing is generic/placeholder and we have something better
-            if ((existingUser.getFirstName() == null || existingUser.getFirstName().equals("User"))
-                    && !finalFirstName.equals("User")) {
-                existingUser.setFirstName(finalFirstName);
-                updated = true;
-            }
-            if ((existingUser.getLastName() == null || existingUser.getLastName().isEmpty())
-                    && !finalLastName.isEmpty()) {
-                existingUser.setLastName(finalLastName);
-                updated = true;
-            }
-            if (updated) {
-                return userRepository.save(existingUser);
-            }
-            return existingUser;
-        }).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setEmail(finalEmail);
-            newUser.setFirstName(finalFirstName);
-            newUser.setLastName(finalLastName);
-            newUser.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
-            newUser.getRoles().add(Role.USER);
+    private User findOrCreateUser(String email, String firstName, String lastName, Authentication authentication) {
+        return userRepository.findByEmail(email)
+                .map(existingUser -> updateUserIfNeeded(existingUser, firstName, lastName))
+                .orElseGet(() -> createNewUser(email, firstName, lastName, authentication));
+    }
 
-            // Determine provider
-            String registrationId = "OAUTH";
-            if (authentication instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-                registrationId = ((org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication)
-                        .getAuthorizedClientRegistrationId().toUpperCase();
-            }
-            newUser.setAuthProvider(registrationId);
+    private User updateUserIfNeeded(User existingUser, String firstName, String lastName) {
+        boolean updated = false;
+        if ((existingUser.getFirstName() == null || "User".equals(existingUser.getFirstName()))
+                && !"User".equals(firstName)) {
+            existingUser.setFirstName(firstName);
+            updated = true;
+        }
+        if ((existingUser.getLastName() == null || existingUser.getLastName().isEmpty())
+                && !lastName.isEmpty()) {
+            existingUser.setLastName(lastName);
+            updated = true;
+        }
+        return updated ? userRepository.save(existingUser) : existingUser;
+    }
 
-            return userRepository.save(newUser);
-        });
+    private User createNewUser(String email, String firstName, String lastName, Authentication authentication) {
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        newUser.getRoles().add(Role.USER);
 
-        // Embed user info in JWT claims
+        String registrationId = "OAUTH";
+        if (authentication instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
+            registrationId = ((org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication)
+                    .getAuthorizedClientRegistrationId().toUpperCase();
+        }
+        newUser.setAuthProvider(registrationId);
+
+        return userRepository.save(newUser);
+    }
+
+    private String createToken(User user) {
         java.util.Map<String, Object> extraClaims = new java.util.HashMap<>();
         extraClaims.put("firstName", user.getFirstName());
         extraClaims.put("lastName", user.getLastName());
-        // Also send authProvider to frontend so it can hide password field
         extraClaims.put("authProvider", user.getAuthProvider());
 
         String role = user.getRoles().stream()
@@ -140,8 +144,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                         .map(r -> new org.springframework.security.core.authority.SimpleGrantedAuthority(r.name()))
                         .collect(java.util.stream.Collectors.toList()));
 
-        String token = jwtService.generateToken(extraClaims, userDetails);
-
-        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/auth/login?token=" + token);
+        return jwtService.generateToken(extraClaims, userDetails);
     }
 }

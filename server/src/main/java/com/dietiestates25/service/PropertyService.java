@@ -35,63 +35,53 @@ public class PropertyService {
     private final org.locationtech.jts.geom.GeometryFactory geometryFactory = new org.locationtech.jts.geom.GeometryFactory(
             new org.locationtech.jts.geom.PrecisionModel(), 4326);
 
-    public Page<PropertyDTO> searchProperties(String city, String type, BigDecimal minPrice, BigDecimal maxPrice,
-            Integer rooms, Integer minSize, Integer maxSize, Integer floor, Integer bathrooms, String energyClass,
-            String condition, String agentEmail, Double latitude, Double longitude, Double radius,
-            int page, int limit) {
-        System.out.println(
-                "DEBUG: searchProperties called with city=" + city + ", type=" + type + ", agentEmail=" + agentEmail);
-        Specification<Property> spec = (root, query, cb) -> {
+    @Transactional(readOnly = true)
+    public Page<PropertyDTO> searchProperties(com.dietiestates25.dto.PropertySearchCriteria criteria, int page,
+            int limit) {
+        Specification<Property> spec = createSearchSpecification(criteria);
+        Page<Property> result = propertyRepository.findAll(spec, PageRequest.of(page, limit));
+        return result.map(this::mapToDTO);
+    }
+
+    private Specification<Property> createSearchSpecification(com.dietiestates25.dto.PropertySearchCriteria criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (city != null && !city.isEmpty())
-                predicates.add(cb.like(cb.lower(root.get("city")), "%" + city.toLowerCase() + "%")); // Changed to fuzzy
-                                                                                                     // search for
-                                                                                                     // better UX
-            if (type != null && !type.isEmpty())
-                predicates.add(
-                        cb.equal(root.get("type"), com.dietiestates25.model.PropertyType.valueOf(type.toUpperCase())));
-            if (minPrice != null)
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            if (maxPrice != null)
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
-            if (rooms != null)
-                predicates.add(cb.greaterThanOrEqualTo(root.get("rooms"), rooms)); // Changed to x+
-            if (minSize != null)
-                predicates.add(cb.greaterThanOrEqualTo(root.get("sizeSqm"), minSize));
-            if (maxSize != null)
-                predicates.add(cb.lessThanOrEqualTo(root.get("sizeSqm"), maxSize));
-            if (floor != null)
-                predicates.add(cb.equal(root.get("floor"), floor));
-            if (bathrooms != null)
-                predicates.add(cb.greaterThanOrEqualTo(root.get("bathrooms"), bathrooms)); // Assuming x+ for bathrooms
-                                                                                           // too
-            if (energyClass != null && !energyClass.isEmpty())
-                predicates.add(cb.equal(root.get("energyClass"), EnergyClass.valueOf(energyClass.toUpperCase())));
-            if (condition != null && !condition.isEmpty())
-                predicates.add(cb.equal(root.get("condition"), condition));
-
-            if (agentEmail != null && !agentEmail.isEmpty()) {
-                // Join with Agent (User) to filter by email
-                // property.agent -> User.email
-                predicates.add(cb.equal(root.join("agent").get("email"), agentEmail));
+            if (criteria.getCity() != null && !criteria.getCity().isEmpty())
+                predicates.add(cb.like(cb.lower(root.get("city")), "%" + criteria.getCity().toLowerCase() + "%"));
+            if (criteria.getType() != null && !criteria.getType().isEmpty())
+                predicates.add(cb.equal(root.get("type"),
+                        com.dietiestates25.model.PropertyType.valueOf(criteria.getType().toUpperCase())));
+            if (criteria.getMinPrice() != null)
+                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), criteria.getMinPrice()));
+            if (criteria.getMaxPrice() != null)
+                predicates.add(cb.lessThanOrEqualTo(root.get("price"), criteria.getMaxPrice()));
+            if (criteria.getRooms() != null)
+                predicates.add(cb.greaterThanOrEqualTo(root.get("rooms"), criteria.getRooms()));
+            if (criteria.getMinSize() != null)
+                predicates.add(cb.greaterThanOrEqualTo(root.get("sizeSqm"), criteria.getMinSize()));
+            if (criteria.getMaxSize() != null)
+                predicates.add(cb.lessThanOrEqualTo(root.get("sizeSqm"), criteria.getMaxSize()));
+            if (criteria.getFloor() != null)
+                predicates.add(cb.equal(root.get("floor"), criteria.getFloor()));
+            if (criteria.getBathrooms() != null)
+                predicates.add(cb.greaterThanOrEqualTo(root.get("bathrooms"), criteria.getBathrooms()));
+            if (criteria.getEnergyClass() != null && !criteria.getEnergyClass().isEmpty())
+                predicates.add(cb.equal(root.get("energyClass"),
+                        EnergyClass.valueOf(criteria.getEnergyClass().toUpperCase())));
+            if (criteria.getCondition() != null && !criteria.getCondition().isEmpty())
+                predicates.add(cb.equal(root.get("condition"), criteria.getCondition()));
+            if (criteria.getAgentEmail() != null && !criteria.getAgentEmail().isEmpty()) {
+                predicates.add(cb.equal(root.join("agent").get("email"), criteria.getAgentEmail()));
             }
-
-            if (latitude != null && longitude != null && radius != null) {
-                var point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-                // Use Hibernate Spatial's ST_Distance function
-                // Note: The database column is 'geography', so ST_Distance returns meters.
-                // We assume 'radius' is passed in meters.
+            if (criteria.getLatitude() != null && criteria.getLongitude() != null && criteria.getRadius() != null) {
+                var point = geometryFactory
+                        .createPoint(new Coordinate(criteria.getLongitude(), criteria.getLatitude()));
                 predicates.add(cb.lessThan(
                         cb.function("ST_Distance", Double.class, root.get("location"), cb.literal(point)),
-                        radius));
+                        criteria.getRadius()));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
-        Page<Property> result = propertyRepository.findAll(spec, PageRequest.of(page, limit));
-        System.out.println("DEBUG: searchProperties found " + result.getTotalElements() + " items.");
-        return result.map(this::mapToDTO);
     }
 
     @Transactional
@@ -99,11 +89,17 @@ public class PropertyService {
         Agent agent = agentRepository.findByEmail(agentEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with email: " + agentEmail));
 
-        // Agent must have an agency
         if (agent.getAgency() == null) {
             throw new RuntimeException("Agent does not belong to an agency");
         }
 
+        Property property = mapRequestToEntity(request, agent);
+        propertyRepository.save(property);
+
+        return mapToDTO(property);
+    }
+
+    private Property mapRequestToEntity(PropertyCreateRequest request, Agent agent) {
         Property property = new Property();
         property.setAgent(agent);
         property.setAgency(agent.getAgency());
@@ -133,8 +129,15 @@ public class PropertyService {
                     request.getLongitude().doubleValue(), request.getLatitude().doubleValue())));
         }
 
-        if (request.getAmenities() != null) {
-            for (String amenityName : request.getAmenities()) {
+        addAmenities(property, request.getAmenities());
+        addPhotos(property, request.getPhotos());
+
+        return property;
+    }
+
+    private void addAmenities(Property property, List<String> amenities) {
+        if (amenities != null) {
+            for (String amenityName : amenities) {
                 Amenity amenity = amenityRepository.findByName(amenityName)
                         .orElseGet(() -> {
                             Amenity newAmenity = new Amenity();
@@ -144,21 +147,19 @@ public class PropertyService {
                 property.getAmenities().add(amenity);
             }
         }
+    }
 
-        if (request.getPhotos() != null) {
-            for (String photoUrl : request.getPhotos()) {
+    private void addPhotos(Property property, List<String> photos) {
+        if (photos != null) {
+            for (String photoUrl : photos) {
                 PropertyPhoto photo = new PropertyPhoto();
                 photo.setUrl(photoUrl);
                 photo.setProperty(property);
                 property.getPhotos().add(photo);
             }
         }
-
-        propertyRepository.save(property);
-        return mapToDTO(property);
     }
 
-    @SuppressWarnings("null")
     public PropertyDTO getProperty(Long id) {
         return propertyRepository.findById(id).map(this::mapToDTO).orElseThrow(() -> new RuntimeException("Not found"));
     }

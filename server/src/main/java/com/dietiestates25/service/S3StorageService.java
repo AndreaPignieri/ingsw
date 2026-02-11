@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class S3StorageService implements StorageService {
 
     @Override
     public void init() {
-        System.out.println("Initializing S3 Storage Service with bucket: " + bucketName);
+        // This method is empty because the storage is initialized by the AWS SDK.
     }
 
     @Override

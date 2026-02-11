@@ -2,7 +2,6 @@ package com.dietiestates25.service;
 
 import com.dietiestates25.dto.PropertyCreateRequest;
 import com.dietiestates25.dto.PropertyDTO;
-import com.dietiestates25.model.EnergyClass;
 import com.dietiestates25.model.Property;
 import com.dietiestates25.model.PropertyType;
 import com.dietiestates25.repository.PropertyRepository;
@@ -39,16 +38,20 @@ class PropertyServiceTest {
     // --- Search Tests ---
 
     @Test
-    @SuppressWarnings("null")
     void searchProperties_CallsRepo() {
         Page<Property> emptyPage = new PageImpl<>(Collections.emptyList());
-        when(propertyRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(emptyPage);
+        when(propertyRepository.findAll(org.mockito.ArgumentMatchers.<Specification<Property>>any(),
+                any(Pageable.class))).thenReturn(emptyPage);
 
-        Page<PropertyDTO> result = propertyService.searchProperties("Rome", null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, 0, 10);
+        com.dietiestates25.dto.PropertySearchCriteria criteria = com.dietiestates25.dto.PropertySearchCriteria.builder()
+                .city("Rome")
+                .build();
+
+        Page<PropertyDTO> result = propertyService.searchProperties(criteria, 0, 10);
 
         assertNotNull(result);
-        verify(propertyRepository).findAll(any(Specification.class), any(Pageable.class));
+        verify(propertyRepository).findAll(org.mockito.ArgumentMatchers.<Specification<Property>>any(),
+                any(Pageable.class));
     }
 
     // --- Create Tests ---

@@ -55,7 +55,6 @@ public class PropertyControllerTest {
 
         @Test
         @org.springframework.security.test.context.support.WithMockUser
-        @SuppressWarnings("null")
         public void shouldSearchProperties() throws Exception {
                 PropertyDTO mockProperty = new PropertyDTO();
                 mockProperty.setId(1L);
@@ -72,8 +71,8 @@ public class PropertyControllerTest {
                                 org.springframework.data.domain.PageRequest.of(0, 10),
                                 properties.size());
 
-                when(propertyService.searchProperties(any(), any(), any(), any(), any(), any(), any(), any(), any(),
-                                any(), any(), any(), any(), any(), any(), anyInt(), anyInt()))
+                when(propertyService.searchProperties(any(com.dietiestates25.dto.PropertySearchCriteria.class),
+                                anyInt(), anyInt()))
                                 .thenReturn(mockPage);
 
                 mockMvc.perform(get("/properties")

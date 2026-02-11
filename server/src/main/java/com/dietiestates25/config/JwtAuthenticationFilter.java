@@ -54,14 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new ServletException("Invalid Token");
                 }
             } else if (userEmail == null) {
-                System.err.println("JWT Warning: userEmail is null");
                 throw new ServletException("Invalid Token");
             }
 
-            // Debug Log
-            // System.out.println("Partially authenticated user: " + userEmail);
         } catch (Exception e) {
-            System.err.println("JWT Authentication Warning: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid Token");
             return;

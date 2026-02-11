@@ -15,30 +15,28 @@ public class UserService {
     private final UserRepository userRepository;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    @SuppressWarnings("null")
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
+
     public UserDTO getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
         return mapToDTO(user);
     }
 
-    @SuppressWarnings("null")
     public UserDTO getUser(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
         return mapToDTO(user);
     }
 
     @Transactional
-    @SuppressWarnings("null")
     public void updateUser(Long id, UserUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
         updateUserFields(user, request);
         userRepository.save(user);
     }
 
     @Transactional
-    @SuppressWarnings("null")
     public void updateUser(String email, UserUpdateRequest request) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
         updateUserFields(user, request);
         userRepository.save(user);
     }
@@ -50,6 +48,12 @@ public class UserService {
             user.setLastName(request.getLastName());
         if (request.getEmail() != null)
             user.setEmail(request.getEmail());
+
+        updatePassword(user, request);
+        updateAgentFields(user, request);
+    }
+
+    private void updatePassword(User user, UserUpdateRequest request) {
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             if (request.getOldPassword() == null || request.getOldPassword().isEmpty()) {
                 throw new IllegalArgumentException("Old password is required to set a new password");
@@ -59,21 +63,25 @@ public class UserService {
             }
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
+    }
 
+    private void updateAgentFields(User user, UserUpdateRequest request) {
         if (user instanceof com.dietiestates25.model.Agent) {
             com.dietiestates25.model.Agent agent = (com.dietiestates25.model.Agent) user;
             if (request.getBiography() != null) {
                 agent.setBiography(request.getBiography());
             }
             if (request.getProfilePhoto() != null) {
-                // Strip any query parameters (timestamp) before saving
-                String cleanUrl = request.getProfilePhoto();
-                if (cleanUrl.contains("?")) {
-                    cleanUrl = cleanUrl.substring(0, cleanUrl.indexOf("?"));
-                }
-                agent.setProfilePhoto(cleanUrl);
+                agent.setProfilePhoto(cleanProfilePhotoUrl(request.getProfilePhoto()));
             }
         }
+    }
+
+    private String cleanProfilePhotoUrl(String url) {
+        if (url != null && url.contains("?")) {
+            return url.substring(0, url.indexOf("?"));
+        }
+        return url;
     }
 
     private UserDTO mapToDTO(User user) {

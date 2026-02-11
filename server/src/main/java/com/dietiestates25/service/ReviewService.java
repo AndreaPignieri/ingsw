@@ -8,7 +8,7 @@ import com.dietiestates25.model.User;
 import com.dietiestates25.repository.AgentRepository;
 import com.dietiestates25.repository.ReviewRepository;
 import com.dietiestates25.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
 
-    @Autowired
-    private ReviewRepository reviewRepository;
-
-    @Autowired
-    private AgentRepository agentRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final AgentRepository agentRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<ReviewDTO> getReviewsByAgent(Long agentId) {

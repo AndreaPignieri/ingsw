@@ -18,18 +18,12 @@ public class FileUploadController {
 
     private final StorageService storageService;
 
-    @jakarta.annotation.PostConstruct
-    public void init() {
-        System.out.println("FileUploadController has been initialized!");
-    }
-
     @PostMapping
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String fileUrl = storageService.store(file);
             return ResponseEntity.ok(Map.of("url", fileUrl));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }

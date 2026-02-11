@@ -72,9 +72,7 @@ public class AgentService {
     }
 
     @Transactional(readOnly = true)
-    @SuppressWarnings("null")
     public AgentDTO getAgent(Long id) {
-        System.out.println("DEBUG: Fetching agent with ID: " + id);
         Agent agent = null;
         try {
             agent = agentRepository.findById(id)
@@ -83,17 +81,13 @@ public class AgentService {
         } catch (com.dietiestates25.exception.ResourceNotFoundException e) {
             throw e;
         } catch (Throwable t) {
-            System.err.println("CRITICAL ERROR in getAgent -> findById: " + t.getMessage());
-            t.printStackTrace();
             throw new RuntimeException("Crash during agent fetch", t);
         }
 
-        System.out.println("DEBUG: Agent found: " + agent.getId());
         return mapToDTO(agent);
     }
 
     @Transactional
-    @SuppressWarnings("null")
     public void updateAgent(Long id, AgentUpdateRequest request) {
         Agent agent = agentRepository.findById(id).orElseThrow(() -> new RuntimeException("Agent not found"));
         if (request.getFirstName() != null)
@@ -113,7 +107,6 @@ public class AgentService {
 
     private AgentDTO mapToDTO(Agent agent) {
         try {
-            System.out.println("DEBUG: Mapping Agent to DTO: " + agent.getId());
             AgentDTO dto = new AgentDTO();
             dto.setId(agent.getId());
             dto.setFirstName(agent.getFirstName());
@@ -124,17 +117,11 @@ public class AgentService {
             dto.setBirthDate(agent.getBirthDate());
             dto.setPhoneNumber(agent.getPhoneNumber());
 
-            System.out.println("DEBUG: Basic agent fields mapped.");
-
             if (agent.getAgency() != null) {
                 dto.setAgencyName(agent.getAgency().getName());
-                System.out.println("DEBUG: Agency name set: " + agent.getAgency().getName());
             }
 
-            // Fetch properties
-            System.out.println("DEBUG: Fetching properties for agent " + agent.getId());
             var properties = propertyRepository.findByAgentId(agent.getId());
-            System.out.println("DEBUG: Found " + (properties != null ? properties.size() : "null") + " properties.");
 
             if (properties != null) {
                 dto.setProperties(
@@ -143,12 +130,8 @@ public class AgentService {
                 dto.setProperties(new java.util.ArrayList<>());
             }
 
-            System.out.println("DEBUG: Properties mapped.");
-
             return dto;
         } catch (Exception e) {
-            System.err.println("ERROR mapping agent to DTO: " + e.getMessage());
-            e.printStackTrace();
             throw e;
         }
     }

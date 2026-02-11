@@ -37,9 +37,27 @@ public class PropertyController {
             @RequestParam(required = false) Double radius,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int limit) {
+
+        var criteria = com.dietiestates25.dto.PropertySearchCriteria.builder()
+                .city(city)
+                .type(type)
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .rooms(rooms)
+                .minSize(minSize)
+                .maxSize(maxSize)
+                .floor(floor)
+                .bathrooms(bathrooms)
+                .energyClass(energyClass)
+                .condition(condition)
+                .agentEmail(agentEmail)
+                .latitude(latitude)
+                .longitude(longitude)
+                .radius(radius)
+                .build();
+
         return ResponseEntity
-                .ok(propertyService.searchProperties(city, type, minPrice, maxPrice, rooms, minSize, maxSize, floor,
-                        bathrooms, energyClass, condition, agentEmail, latitude, longitude, radius, page, limit));
+                .ok(propertyService.searchProperties(criteria, page, limit));
     }
 
     @PostMapping

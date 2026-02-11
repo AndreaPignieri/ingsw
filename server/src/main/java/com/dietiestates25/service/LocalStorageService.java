@@ -20,7 +20,6 @@ public class LocalStorageService implements StorageService {
     @PostConstruct
     public void init() {
         try {
-            System.out.println("Initializing storage at: " + rootLocation);
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize storage", e);
@@ -51,8 +50,6 @@ public class LocalStorageService implements StorageService {
                 throw new RuntimeException(
                         "Cannot store file outside current directory.");
             }
-
-            System.out.println("Storing file to: " + destinationFile);
 
             try (java.io.InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile,
