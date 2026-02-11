@@ -63,6 +63,7 @@ class AgencyControllerTest {
     void createAgency_ValidRequest_ReturnsCreated() throws Exception {
         AgencyCreateRequest request = new AgencyCreateRequest();
         request.setName("Test Agency");
+        request.setAddress("Test Address");
         request.setPhone("1234567890");
         request.setEmail("agency@test.com");
         request.setManagerEmail("manager@test.com");
