@@ -1,7 +1,7 @@
 package com.dietiestates25.service;
 
 import com.dietiestates25.exception.ResourceNotFoundException;
-import com.dietiestates25.exception.UserAlreadyExistsException;
+import com.dietiestates25.exception.AgentServiceException;
 import com.dietiestates25.dto.AgentCreateRequest;
 import com.dietiestates25.dto.AgentDTO;
 import com.dietiestates25.dto.AgentUpdateRequest;
@@ -52,13 +52,13 @@ public class AgentService {
     public java.util.List<AgentDTO> getAllAgents() {
         return agentRepository.findAll().stream()
                 .map(this::mapToDTO)
-                .collect(java.util.stream.Collectors.toList());
+                .toList();
     }
 
     public java.util.List<AgentDTO> getAgentsByAgency(Long agencyId) {
         return agentRepository.findByAgencyId(agencyId).stream()
                 .map(this::mapToDTO)
-                .collect(java.util.stream.Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +83,7 @@ public class AgentService {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Throwable t) {
-            throw new RuntimeException("Crash during agent fetch", t);
+            throw new AgentServiceException("Crash during agent fetch", t);
         }
 
         return mapToDTO(agent);
@@ -126,7 +126,7 @@ public class AgentService {
 
         if (properties != null) {
             dto.setProperties(
-                    properties.stream().map(this::mapPropertyToDTO).collect(java.util.stream.Collectors.toList()));
+                    properties.stream().map(this::mapPropertyToDTO).toList());
         } else {
             dto.setProperties(new java.util.ArrayList<>());
         }
@@ -155,14 +155,14 @@ public class AgentService {
         // Handle potential null collections
         if (property.getPhotos() != null) {
             dto.setPhotos(property.getPhotos().stream().map(com.dietiestates25.model.PropertyPhoto::getUrl)
-                    .collect(java.util.stream.Collectors.toList()));
+                    .toList());
         } else {
             dto.setPhotos(new java.util.ArrayList<>());
         }
 
         if (property.getAmenities() != null) {
             dto.setAmenities(property.getAmenities().stream().map(com.dietiestates25.model.Amenity::getName)
-                    .collect(java.util.stream.Collectors.toList()));
+                    .toList());
         } else {
             dto.setAmenities(new java.util.ArrayList<>());
         }

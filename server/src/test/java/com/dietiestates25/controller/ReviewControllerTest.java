@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ReviewController.class)
 @Import(com.dietiestates25.config.SecurityConfig.class)
-public class ReviewControllerTest {
+class ReviewControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

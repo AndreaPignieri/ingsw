@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 com.dietiestates25.config.SecurityConfig.class,
                 com.dietiestates25.exception.GlobalExceptionHandler.class
 })
-public class AuthControllerTest {
+class AuthControllerTest {
 
         @Autowired
         private MockMvc mockMvc;

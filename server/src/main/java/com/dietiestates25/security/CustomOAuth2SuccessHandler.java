@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -116,9 +117,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         newUser.getRoles().add(Role.USER);
 
         String registrationId = "OAUTH";
-        if (authentication instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-            registrationId = ((org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication)
-                    .getAuthorizedClientRegistrationId().toUpperCase();
+        if (authentication instanceof OAuth2AuthenticationToken oauth2authenticationtoken) {
+            registrationId = oauth2authenticationtoken.getAuthorizedClientRegistrationId().toUpperCase();
         }
         newUser.setAuthProvider(registrationId);
 

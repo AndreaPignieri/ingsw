@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import com.dietiestates25.exception.AgentServiceException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AgentController.class)
 @Import(com.dietiestates25.config.SecurityConfig.class)
-public class AgentControllerTest {
+class AgentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -105,5 +106,15 @@ public class AgentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void getAgent_ServiceException_ReturnsInternalServerError() throws Exception {
+        when(agentService.getAgent(99L)).thenThrow(new AgentServiceException("Service error"));
+
+        mockMvc.perform(get("/agents/99"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Service error"));
     }
 }

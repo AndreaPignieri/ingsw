@@ -25,8 +25,6 @@ import com.dietiestates25.repository.AgentRepository;
 import com.dietiestates25.exception.ResourceNotFoundException;
 import org.locationtech.jts.geom.Coordinate;
 
-import com.dietiestates25.exception.ResourceNotFoundException;
-
 @Service
 @RequiredArgsConstructor
 public class PropertyService {

@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest(PropertyController.class)
 @org.springframework.context.annotation.Import(com.dietiestates25.config.SecurityConfig.class)
-public class PropertyControllerTest {
+class PropertyControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
