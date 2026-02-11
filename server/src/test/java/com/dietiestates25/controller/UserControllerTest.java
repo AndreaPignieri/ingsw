@@ -58,7 +58,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "me@example.com")
-    public void getMyProfile_ReturnsUser() throws Exception {
+    void getMyProfile_ReturnsUser() throws Exception {
         UserDTO mockUser = new UserDTO();
         mockUser.setId(1L);
         mockUser.setEmail("me@example.com");
@@ -72,7 +72,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "me@example.com")
-    public void updateMyProfile_ValidRequest_ReturnsOk() throws Exception {
+    void updateMyProfile_ValidRequest_ReturnsOk() throws Exception {
         UserUpdateRequest request = new UserUpdateRequest();
         request.setFirstName("Updated");
 

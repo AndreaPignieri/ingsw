@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import com.dietiestates25.exception.FileStorageException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -72,7 +73,7 @@ class S3StorageServiceTest {
         when(file.isEmpty()).thenReturn(true);
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> s3StorageService.store(file));
+        assertThrows(FileStorageException.class, () -> s3StorageService.store(file));
     }
 
     @Test

@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.dietiestates25.exception.ResourceNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -34,10 +36,10 @@ public class ReviewService {
     @Transactional
     public ReviewDTO createReview(Long userId, ReviewCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Agent agent = agentRepository.findById(request.getAgentId())
-                .orElseThrow(() -> new RuntimeException("Agent not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
 
         Review review = new Review();
         review.setScore(request.getScore());

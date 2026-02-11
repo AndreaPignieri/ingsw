@@ -57,7 +57,7 @@ public class AgentControllerTest {
 
     @Test
     @WithMockUser(authorities = "AGENCY") // Required for verify
-    public void createAgent_Authorized_ReturnsCreated() throws Exception {
+    void createAgent_Authorized_ReturnsCreated() throws Exception {
         AgentCreateRequest request = new AgentCreateRequest();
         request.setFirstName("New");
         request.setLastName("Agent");
@@ -72,7 +72,7 @@ public class AgentControllerTest {
 
     @Test
     @WithMockUser(authorities = "USER") // Wrong authority
-    public void createAgent_Unauthorized_ReturnsForbidden() throws Exception {
+    void createAgent_Unauthorized_ReturnsForbidden() throws Exception {
         AgentCreateRequest request = new AgentCreateRequest();
 
         mockMvc.perform(post("/agents")
@@ -83,7 +83,7 @@ public class AgentControllerTest {
 
     @Test
     @WithMockUser
-    public void getAgent_ReturnsAgent() throws Exception {
+    void getAgent_ReturnsAgent() throws Exception {
         AgentDTO agent = new AgentDTO();
         agent.setId(1L);
         agent.setFirstName("Agent007");
@@ -97,7 +97,7 @@ public class AgentControllerTest {
 
     @Test
     @WithMockUser
-    public void updateAgent_ReturnsOk() throws Exception {
+    void updateAgent_ReturnsOk() throws Exception {
         AgentUpdateRequest request = new AgentUpdateRequest();
         request.setBiography("New Bio");
 

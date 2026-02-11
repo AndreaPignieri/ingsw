@@ -62,7 +62,7 @@ public class ReviewControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
-    public void createReview_ReturnsCreated() throws Exception {
+    void createReview_ReturnsCreated() throws Exception {
         ReviewCreateRequest request = new ReviewCreateRequest();
         request.setScore(5);
         request.setComment("Nice");
@@ -80,7 +80,7 @@ public class ReviewControllerTest {
 
     @Test
     @WithMockUser
-    public void getReviews_ReturnsList() throws Exception {
+    void getReviews_ReturnsList() throws Exception {
         ReviewDTO review = new ReviewDTO();
         review.setScore(5);
         review.setComment("Nice");

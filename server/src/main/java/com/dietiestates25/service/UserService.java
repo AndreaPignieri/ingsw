@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dietiestates25.exception.ResourceNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -18,25 +20,29 @@ public class UserService {
     private static final String USER_NOT_FOUND_MESSAGE = "User not found";
 
     public UserDTO getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         return mapToDTO(user);
     }
 
     public UserDTO getUser(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         return mapToDTO(user);
     }
 
     @Transactional
     public void updateUser(Long id, UserUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         updateUserFields(user, request);
         userRepository.save(user);
     }
 
     @Transactional
     public void updateUser(String email, UserUpdateRequest request) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MESSAGE));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         updateUserFields(user, request);
         userRepository.save(user);
     }

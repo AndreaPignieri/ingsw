@@ -56,7 +56,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        public void shouldRegisterUserSuccessfully() throws Exception {
+        void shouldRegisterUserSuccessfully() throws Exception {
                 RegisterRequest request = new RegisterRequest();
                 request.setEmail("test@example.com");
                 request.setPassword("password123");
@@ -70,7 +70,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        public void shouldReturnBadRequestOnInvalidRegister() throws Exception {
+        void shouldReturnBadRequestOnInvalidRegister() throws Exception {
                 RegisterRequest request = new RegisterRequest();
                 request.setEmail("invalid-email"); // Invalid email format
                 request.setPassword(""); // Empty password
@@ -84,7 +84,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        public void shouldReturnConflictIfEmailExists() throws Exception {
+        void shouldReturnConflictIfEmailExists() throws Exception {
                 RegisterRequest request = new RegisterRequest();
                 request.setEmail("existing@example.com");
                 request.setPassword("password123");
@@ -102,7 +102,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        public void shouldLoginSuccessfully() throws Exception {
+        void shouldLoginSuccessfully() throws Exception {
                 LoginRequest request = new LoginRequest();
                 request.setEmail("test@example.com");
                 request.setPassword("password123");
@@ -118,7 +118,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        public void shouldReturnNotFoundIfUserNotFound() throws Exception {
+        void shouldReturnNotFoundIfUserNotFound() throws Exception {
                 LoginRequest request = new LoginRequest();
                 request.setEmail("unknown@example.com");
                 request.setPassword("password");

@@ -6,6 +6,8 @@ import com.dietiestates25.model.Role;
 import com.dietiestates25.model.User;
 import com.dietiestates25.repository.AgencyRepository;
 import com.dietiestates25.repository.UserRepository;
+import com.dietiestates25.exception.ResourceNotFoundException;
+import com.dietiestates25.exception.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class AgencyService {
 
         // 2. Create Manager User
         if (userRepository.existsByEmail(request.getManagerEmail())) {
-            throw new RuntimeException("User with email " + request.getManagerEmail() + " already exists");
+            throw new UserAlreadyExistsException("User with email " + request.getManagerEmail() + " already exists");
         }
 
         User manager = new User();
@@ -49,11 +51,11 @@ public class AgencyService {
     @Transactional(readOnly = true)
     public com.dietiestates25.dto.AgencyDTO getAgencyByUser(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Agency agency = user.getAgency();
         if (agency == null) {
-            throw new RuntimeException("User does not belong to an agency");
+            throw new ResourceNotFoundException("User does not belong to an agency");
         }
 
         return mapToDTO(agency);
@@ -62,11 +64,11 @@ public class AgencyService {
     @Transactional
     public void updateAgency(String email, com.dietiestates25.dto.AgencyUpdateRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Agency agency = user.getAgency();
         if (agency == null) {
-            throw new RuntimeException("User does not belong to an agency");
+            throw new ResourceNotFoundException("User does not belong to an agency");
         }
 
         if (request.getName() != null)

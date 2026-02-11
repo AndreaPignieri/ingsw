@@ -25,6 +25,8 @@ import com.dietiestates25.repository.AgentRepository;
 import com.dietiestates25.exception.ResourceNotFoundException;
 import org.locationtech.jts.geom.Coordinate;
 
+import com.dietiestates25.exception.ResourceNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class PropertyService {
@@ -90,7 +92,7 @@ public class PropertyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with email: " + agentEmail));
 
         if (agent.getAgency() == null) {
-            throw new RuntimeException("Agent does not belong to an agency");
+            throw new ResourceNotFoundException("Agent does not belong to an agency");
         }
 
         Property property = mapRequestToEntity(request, agent);
@@ -110,7 +112,7 @@ public class PropertyService {
         try {
             property.setType(com.dietiestates25.model.PropertyType.valueOf(request.getType().toUpperCase()));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid property type");
+            throw new ResourceNotFoundException("Invalid property type");
         }
         property.setCity(request.getCity());
         property.setRooms(request.getRooms());
@@ -161,7 +163,8 @@ public class PropertyService {
     }
 
     public PropertyDTO getProperty(Long id) {
-        return propertyRepository.findById(id).map(this::mapToDTO).orElseThrow(() -> new RuntimeException("Not found"));
+        return propertyRepository.findById(id).map(this::mapToDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
     }
 
     private PropertyDTO mapToDTO(Property p) {

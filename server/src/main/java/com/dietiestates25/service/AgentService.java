@@ -1,5 +1,7 @@
 package com.dietiestates25.service;
 
+import com.dietiestates25.exception.ResourceNotFoundException;
+import com.dietiestates25.exception.UserAlreadyExistsException;
 import com.dietiestates25.dto.AgentCreateRequest;
 import com.dietiestates25.dto.AgentDTO;
 import com.dietiestates25.dto.AgentUpdateRequest;
@@ -27,10 +29,10 @@ public class AgentService {
 
         // Find the manager in DB to get their Agency
         com.dietiestates25.model.User manager = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Manager not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Manager not found"));
 
         if (manager.getAgency() == null) {
-            throw new RuntimeException("Manager is not associated with any Agency");
+            throw new ResourceNotFoundException("Manager is not associated with any Agency");
         }
 
         Agent agent = new Agent();
@@ -62,10 +64,10 @@ public class AgentService {
     @Transactional(readOnly = true)
     public java.util.List<AgentDTO> getAgentsByManagerEmail(String email) {
         com.dietiestates25.model.User manager = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Manager not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Manager not found"));
 
         if (manager.getAgency() == null) {
-            throw new RuntimeException("Manager is not associated with any Agency");
+            throw new ResourceNotFoundException("Manager is not associated with any Agency");
         }
 
         return getAgentsByAgency(manager.getAgency().getId());
@@ -76,9 +78,9 @@ public class AgentService {
         Agent agent = null;
         try {
             agent = agentRepository.findById(id)
-                    .orElseThrow(() -> new com.dietiestates25.exception.ResourceNotFoundException(
+                    .orElseThrow(() -> new ResourceNotFoundException(
                             "Agent not found with id: " + id));
-        } catch (com.dietiestates25.exception.ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Throwable t) {
             throw new RuntimeException("Crash during agent fetch", t);
@@ -89,7 +91,7 @@ public class AgentService {
 
     @Transactional
     public void updateAgent(Long id, AgentUpdateRequest request) {
-        Agent agent = agentRepository.findById(id).orElseThrow(() -> new RuntimeException("Agent not found"));
+        Agent agent = agentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
         if (request.getFirstName() != null)
             agent.setFirstName(request.getFirstName());
         if (request.getLastName() != null)
@@ -106,7 +108,6 @@ public class AgentService {
     }
 
     private AgentDTO mapToDTO(Agent agent) {
-
         AgentDTO dto = new AgentDTO();
         dto.setId(agent.getId());
         dto.setFirstName(agent.getFirstName());
@@ -129,9 +130,7 @@ public class AgentService {
         } else {
             dto.setProperties(new java.util.ArrayList<>());
         }
-
         return dto;
-
     }
 
     private com.dietiestates25.dto.PropertyDTO mapPropertyToDTO(com.dietiestates25.model.Property property) {

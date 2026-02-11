@@ -55,7 +55,7 @@ public class PropertyControllerTest {
 
         @Test
         @org.springframework.security.test.context.support.WithMockUser
-        public void shouldSearchProperties() throws Exception {
+        void shouldSearchProperties() throws Exception {
                 PropertyDTO mockProperty = new PropertyDTO();
                 mockProperty.setId(1L);
                 mockProperty.setTitle("Test Villa");

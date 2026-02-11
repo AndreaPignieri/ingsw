@@ -1,5 +1,6 @@
 package com.dietiestates25.service;
 
+import com.dietiestates25.exception.FileStorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.annotation.PostConstruct;
@@ -22,7 +23,7 @@ public class LocalStorageService implements StorageService {
         try {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage", e);
+            throw new FileStorageException("Could not initialize storage", e);
         }
     }
 
@@ -30,7 +31,7 @@ public class LocalStorageService implements StorageService {
     public String store(MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                throw new RuntimeException("Failed to store empty file.");
+                throw new FileStorageException("Failed to store empty file.");
             }
 
             // Generate unique filename
@@ -47,7 +48,7 @@ public class LocalStorageService implements StorageService {
 
             if (!destinationFile.startsWith(this.rootLocation)) {
                 // This is a security check
-                throw new RuntimeException(
+                throw new FileStorageException(
                         "Cannot store file outside current directory.");
             }
 
@@ -60,7 +61,7 @@ public class LocalStorageService implements StorageService {
             // Since we are in docker, this file is in the container.
             return "/uploads/" + filename;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file.", e);
+            throw new FileStorageException("Failed to store file.", e);
         }
     }
 

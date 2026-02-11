@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import com.dietiestates25.exception.FileStorageException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,7 +35,7 @@ public class S3StorageService implements StorageService {
     @Override
     public String store(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new RuntimeException("Failed to store empty file.");
+            throw new FileStorageException("Failed to store empty file.");
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -56,7 +57,7 @@ public class S3StorageService implements StorageService {
             return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, filename);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload file to S3", e);
+            throw new FileStorageException("Failed to upload file to S3", e);
         }
     }
 
