@@ -24,11 +24,11 @@ class JwtServiceTest {
     private UserDetails userDetails;
 
     // 256-bit key for HMAC-SHA256 (32 bytes encoded in Base64)
-    private final String SECRET_KEY = "NDI0MjQyNDI0MjQyNDI0MjQyNDI0MjQyNDI0MjQyNDI=";
+    private final String secretKey = "NDI0MjQyNDI0MjQyNDI0MjQyNDI0MjQyNDI0MjQyNDI=";
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(jwtService, "secretKey", SECRET_KEY);
+        ReflectionTestUtils.setField(jwtService, "secretKey", secretKey);
         userDetails = new User("testuser", "password", Collections.emptyList());
     }
 

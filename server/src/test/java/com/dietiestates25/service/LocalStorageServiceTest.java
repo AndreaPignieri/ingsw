@@ -61,29 +61,6 @@ class LocalStorageServiceTest {
 
     @Test
     void store_InvalidPath_ThrowsException() {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "../test.txt", // Attempt path traversal
-                "text/plain",
-                "Hello".getBytes());
-
-        // In the current implementation, standard MultipartFile.getOriginalFilename()
-        // cleans the path usually,
-        // but if we force it, the service checks for .. in resolve.
-        // However, the service implementation uses UUID for filename, so original
-        // filename path traversal might be ignored or handled differently.
-        // Checking the code:
-        // String filename = UUID.randomUUID().toString() + extension;
-        // The service ignores the original filename for the most part except extension.
-        // So path traversal via filename is actually mitigated by design.
-
-        // Let's test non-existing directory if possible, or just skip path traversal if
-        // it's not possible to trigger.
-        // The "security check" in existing code: if
-        // (!destinationFile.startsWith(this.rootLocation))
-        // relies on resolve. Since we use UUID, it's hard to trigger.
-
-        // Let's try to mock a file that throws IOException on getInputStream
         MockMultipartFile badFile = new MockMultipartFile(
                 "file",
                 "test.txt",

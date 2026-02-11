@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,8 +61,8 @@ class CustomOAuth2SuccessHandlerTest {
 
     @Test
     void onAuthenticationSuccess_NewUser_CreatesUserAndRedirects() throws IOException {
-        when(response.encodeRedirectURL(anyString())).thenAnswer(I -> I.getArgument(0)); // Fix for
-                                                                                         // DefaultRedirectStrategy
+        when(response.encodeRedirectURL(anyString())).thenAnswer(invocation -> invocation.getArgument(0)); // Fix for
+        // DefaultRedirectStrategy
 
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
 
@@ -95,7 +94,7 @@ class CustomOAuth2SuccessHandlerTest {
 
     @Test
     void onAuthenticationSuccess_ExistingUser_UpdatesAndRedirects() throws IOException {
-        when(response.encodeRedirectURL(anyString())).thenAnswer(I -> I.getArgument(0));
+        when(response.encodeRedirectURL(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
         User existingUser = new User();
         existingUser.setEmail("existing@test.com");
@@ -131,7 +130,7 @@ class CustomOAuth2SuccessHandlerTest {
 
     @Test
     void onAuthenticationSuccess_GithubLogin_UsesLoginAsEmail() throws IOException {
-        when(response.encodeRedirectURL(anyString())).thenAnswer(I -> I.getArgument(0));
+        when(response.encodeRedirectURL(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         lenient().when(oAuth2User.getAttribute("email")).thenReturn(null);
@@ -154,7 +153,7 @@ class CustomOAuth2SuccessHandlerTest {
 
     @Test
     void onAuthenticationSuccess_OAuthToken_SetsAuthProvider() throws IOException {
-        when(response.encodeRedirectURL(anyString())).thenAnswer(I -> I.getArgument(0));
+        when(response.encodeRedirectURL(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
         OAuth2AuthenticationToken oauthToken = mock(OAuth2AuthenticationToken.class);
         when(oauthToken.getPrincipal()).thenReturn(oAuth2User);
