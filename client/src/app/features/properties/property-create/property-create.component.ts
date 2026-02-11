@@ -24,6 +24,7 @@ export class PropertyCreateComponent implements OnInit, AfterViewInit, OnDestroy
     private geocoder: google.maps.Geocoder | undefined;
 
     propertyTypes = Object.values(PropertyType);
+    propertyConditions = ['New', 'Excellent', 'Good', 'Needs Renovation'];
     isLoading = false;
     error = '';
     uploadingPhotos = false;
