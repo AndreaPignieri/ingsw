@@ -3,17 +3,32 @@ package com.dietiestates25.service;
 import com.dietiestates25.dto.AgentCreateRequest;
 import com.dietiestates25.dto.AgentDTO;
 import com.dietiestates25.dto.AgentUpdateRequest;
+import com.dietiestates25.exception.ResourceNotFoundException;
 import com.dietiestates25.model.Agent;
+import com.dietiestates25.model.Agency;
+import com.dietiestates25.model.User;
 import com.dietiestates25.repository.AgentRepository;
+import com.dietiestates25.repository.PropertyRepository;
+import com.dietiestates25.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,107 +38,217 @@ class AgentServiceTest {
     private AgentRepository agentRepository;
 
     @Mock
-    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
 
     @Mock
-    private com.dietiestates25.repository.PropertyRepository propertyRepository;
+    private PropertyRepository propertyRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AgentService agentService;
 
     @Mock
-    private com.dietiestates25.repository.UserRepository userRepository;
+    private SecurityContext securityContext;
 
     @Mock
-    private org.springframework.security.core.Authentication authentication;
+    private Authentication authentication;
 
     @Mock
-    private org.springframework.security.core.context.SecurityContext securityContext;
+    private UserDetails userDetails;
 
-    @Mock
-    private org.springframework.security.core.userdetails.UserDetails userDetails;
+    @BeforeEach
+    void setUp() {
+        // Clear context before each test to avoid pollution
+        SecurityContextHolder.clearContext();
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void createAgent_ValidRequest_SavesAgent() {
-        AgentCreateRequest request = new AgentCreateRequest();
-        request.setFirstName("Agent");
-        request.setLastName("Smith");
-        request.setEmail("agent.smith@matrix.com");
-        request.setPassword("neo");
-
-        // Mock Security Context
+        // Setup Security Context
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("manager@agency.com");
-        org.springframework.security.core.context.SecurityContextHolder.setContext(securityContext);
+        when(userDetails.getUsername()).thenReturn("manager@test.com");
+        SecurityContextHolder.setContext(securityContext);
 
-        // Mock Manager and Agency
-        com.dietiestates25.model.User manager = new com.dietiestates25.model.User();
-        manager.setEmail("manager@agency.com");
-        com.dietiestates25.model.Agency agency = new com.dietiestates25.model.Agency();
-        agency.setId(10L);
+        // Setup Manager and Agency
+        User manager = new User();
+        Agency agency = new Agency();
+        agency.setId(1L);
         manager.setAgency(agency);
+        when(userRepository.findByEmail("manager@test.com")).thenReturn(Optional.of(manager));
 
-        when(userRepository.findByEmail("manager@agency.com")).thenReturn(Optional.of(manager));
-        when(passwordEncoder.encode("neo")).thenReturn("encodedPassword");
+        // Setup Request
+        AgentCreateRequest request = new AgentCreateRequest();
+        request.setFirstName("John");
+        request.setLastName("Doe");
+        request.setEmail("john@doe.com");
+        request.setPassword("password");
+        request.setBiography("Bio");
+        request.setProfilePhoto("photo.jpg");
+
+        when(passwordEncoder.encode("password")).thenReturn("encoded");
 
         agentService.createAgent(request);
 
-        verify(agentRepository).save(argThat(agent -> agent.getEmail().equals("agent.smith@matrix.com") &&
-                agent.getRoles().contains(com.dietiestates25.model.Role.AGENT) &&
-                agent.getAgency().getId().equals(10L)));
-
-        // Cleanup
-        org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        verify(agentRepository).save(argThat(agent -> agent.getEmail().equals("john@doe.com") &&
+                agent.getFirstName().equals("John") &&
+                agent.getPasswordHash().equals("encoded") &&
+                agent.getAgency().getId().equals(1L) &&
+                agent.getRoles().contains(com.dietiestates25.model.Role.AGENT)));
     }
 
     @Test
-    void getAgent_ExistingId_ReturnsDTO() {
+    void createAgent_ManagerNotFound_ThrowsException() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn("manager@test.com");
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail("manager@test.com")).thenReturn(Optional.empty());
+
+        AgentCreateRequest request = new AgentCreateRequest();
+        assertThrows(ResourceNotFoundException.class, () -> agentService.createAgent(request));
+    }
+
+    @Test
+    void createAgent_ManagerHasNoAgency_ThrowsException() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn("manager@test.com");
+        SecurityContextHolder.setContext(securityContext);
+
+        User manager = new User();
+        manager.setAgency(null); // No agency
+        when(userRepository.findByEmail("manager@test.com")).thenReturn(Optional.of(manager));
+
+        AgentCreateRequest request = new AgentCreateRequest();
+        assertThrows(ResourceNotFoundException.class, () -> agentService.createAgent(request));
+    }
+
+    @Test
+    void updateAgent_AllFields_UpdatesCorrectly() {
         Long id = 1L;
         Agent agent = new Agent();
         agent.setId(id);
-        agent.setFirstName("Bond");
 
         when(agentRepository.findById(id)).thenReturn(Optional.of(agent));
-        when(propertyRepository.findByAgentId(id)).thenReturn(java.util.Collections.emptyList());
-
-        AgentDTO result = agentService.getAgent(id);
-
-        assertEquals("Bond", result.getFirstName());
-    }
-
-    @Test
-    void getAgent_NonExistingId_ThrowsException() {
-        Long id = 99L;
-        when(agentRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> agentService.getAgent(id));
-    }
-
-    @Test
-    void updateAgent_ExistingId_UpdatesFields() {
-        Long id = 1L;
-        Agent agent = new Agent();
-        agent.setId(id);
-        agent.setBiography("Old Bio");
 
         AgentUpdateRequest request = new AgentUpdateRequest();
-        request.setBiography("New Bio");
-
-        when(agentRepository.findById(id)).thenReturn(Optional.of(agent));
+        request.setFirstName("NewFirst");
+        request.setLastName("NewLast");
+        request.setBiography("NewBio");
+        request.setProfilePhoto("new.jpg");
+        request.setBirthDate(LocalDate.of(1990, 1, 1));
+        request.setPhoneNumber("1234567890");
 
         agentService.updateAgent(id, request);
 
-        assertEquals("New Bio", agent.getBiography());
+        assertEquals("NewFirst", agent.getFirstName());
+        assertEquals("NewLast", agent.getLastName());
+        assertEquals("NewBio", agent.getBiography());
+        assertEquals("new.jpg", agent.getProfilePhoto());
+        assertEquals(LocalDate.of(1990, 1, 1), agent.getBirthDate());
+        assertEquals("1234567890", agent.getPhoneNumber());
         verify(agentRepository).save(agent);
     }
 
     @Test
-    void updateAgent_NonExistingId_ThrowsException() {
-        Long id = 99L;
-        AgentUpdateRequest request = new AgentUpdateRequest();
-        when(agentRepository.findById(id)).thenReturn(Optional.empty());
+    void updateAgent_PartialFields_UpdatesOnlyNotNull() {
+        Long id = 1L;
+        Agent agent = new Agent();
+        agent.setId(id);
+        agent.setFirstName("OldFirst");
+        agent.setLastName("OldLast");
 
-        assertThrows(RuntimeException.class, () -> agentService.updateAgent(id, request));
+        when(agentRepository.findById(id)).thenReturn(Optional.of(agent));
+
+        AgentUpdateRequest request = new AgentUpdateRequest();
+        request.setFirstName("NewFirst");
+        // match other fields as null
+
+        agentService.updateAgent(id, request);
+
+        assertEquals("NewFirst", agent.getFirstName());
+        assertEquals("OldLast", agent.getLastName()); // unchanged
+        verify(agentRepository).save(agent);
+    }
+
+    @Test
+    void getAgent_WithProperties_MapsCorrectly() {
+        Long id = 1L;
+        Agent agent = new Agent();
+        agent.setId(id);
+        Agency agency = new Agency();
+        agency.setName("Test Agency");
+        agent.setAgency(agency);
+
+        com.dietiestates25.model.Property property = new com.dietiestates25.model.Property();
+        property.setId(100L);
+        property.setTitle("Test Prop");
+        property.setType(com.dietiestates25.model.PropertyType.SALE);
+
+        when(agentRepository.findById(id)).thenReturn(Optional.of(agent));
+        when(propertyRepository.findByAgentId(id)).thenReturn(Collections.singletonList(property));
+
+        AgentDTO dto = agentService.getAgent(id);
+
+        assertEquals(id, dto.getId());
+        assertEquals("Test Agency", dto.getAgencyName());
+        assertEquals(1, dto.getProperties().size());
+        assertEquals("Test Prop", dto.getProperties().get(0).getTitle());
+    }
+
+    @Test
+    void getAgentsByAgency_ReturnsList() {
+        Long agencyId = 1L;
+        Agent agent = new Agent();
+        agent.setId(2L);
+
+        when(agentRepository.findByAgencyId(agencyId)).thenReturn(Collections.singletonList(agent));
+        when(propertyRepository.findByAgentId(2L)).thenReturn(Collections.emptyList());
+
+        var result = agentService.getAgentsByAgency(agencyId);
+
+        assertEquals(1, result.size());
+        assertEquals(2L, result.get(0).getId());
+    }
+
+    @Test
+    void getAgentsByManagerEmail_Valid_ReturnsList() {
+        String email = "manager@test.com";
+        User manager = new User();
+        Agency agency = new Agency();
+        agency.setId(10L);
+        manager.setAgency(agency);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(manager));
+
+        Agent agent = new Agent();
+        agent.setId(20L);
+        when(agentRepository.findByAgencyId(10L)).thenReturn(Collections.singletonList(agent));
+        when(propertyRepository.findByAgentId(20L)).thenReturn(Collections.emptyList());
+
+        var result = agentService.getAgentsByManagerEmail(email);
+
+        assertEquals(1, result.size());
+        assertEquals(20L, result.get(0).getId());
+    }
+
+    @Test
+    void getAgentsByManagerEmail_ManagerHasNoAgency_ThrowsException() {
+        String email = "manager@test.com";
+        User manager = new User();
+        manager.setAgency(null);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(manager));
+
+        assertThrows(ResourceNotFoundException.class, () -> agentService.getAgentsByManagerEmail(email));
     }
 }
