@@ -117,4 +117,41 @@ class AgentControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("Service error"));
     }
+
+    @Test
+    @WithMockUser
+    void getAllAgents_NoParams_ReturnsList() throws Exception {
+        AgentDTO agent = new AgentDTO();
+        agent.setId(1L);
+        when(agentService.getAllAgents()).thenReturn(java.util.Collections.singletonList(agent));
+
+        mockMvc.perform(get("/agents"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1));
+    }
+
+    @Test
+    @WithMockUser
+    void getAllAgents_WithAgencyId_ReturnsList() throws Exception {
+        AgentDTO agent = new AgentDTO();
+        agent.setId(2L);
+        when(agentService.getAgentsByAgency(10L)).thenReturn(java.util.Collections.singletonList(agent));
+
+        mockMvc.perform(get("/agents").param("agencyId", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(2));
+    }
+
+    @Test
+    @WithMockUser(username = "manager@example.com", authorities = "AGENCY")
+    void getMyAgents_ReturnsList() throws Exception {
+        AgentDTO agent = new AgentDTO();
+        agent.setId(3L);
+        when(agentService.getAgentsByManagerEmail("manager@example.com"))
+                .thenReturn(java.util.Collections.singletonList(agent));
+
+        mockMvc.perform(get("/agents/my-agency"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(3));
+    }
 }

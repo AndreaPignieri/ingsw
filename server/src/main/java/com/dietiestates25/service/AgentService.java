@@ -82,8 +82,8 @@ public class AgentService {
                             "Agent not found with id: " + id));
         } catch (ResourceNotFoundException e) {
             throw e;
-        } catch (Throwable t) {
-            throw new AgentServiceException("Crash during agent fetch", t);
+        } catch (Exception e) {
+            throw new AgentServiceException("Crash during agent fetch", e);
         }
 
         return mapToDTO(agent);

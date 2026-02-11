@@ -32,6 +32,9 @@ class PropertyServiceTest {
     @Mock
     private com.dietiestates25.repository.AmenityRepository amenityRepository;
 
+    @Mock
+    private com.dietiestates25.repository.AgentRepository agentRepository;
+
     @InjectMocks
     private PropertyService propertyService;
 
@@ -53,11 +56,6 @@ class PropertyServiceTest {
         verify(propertyRepository).findAll(org.mockito.ArgumentMatchers.<Specification<Property>>any(),
                 any(Pageable.class));
     }
-
-    // --- Create Tests ---
-
-    @Mock
-    private com.dietiestates25.repository.AgentRepository agentRepository;
 
     @Test
     void createProperty_ValidData_SavesProperty() {

@@ -30,7 +30,7 @@ public class ReviewService {
     public List<ReviewDTO> getReviewsByAgent(Long agentId) {
         return reviewRepository.findByAgentIdOrderByCreatedAtDesc(agentId).stream()
                 .map(ReviewDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional

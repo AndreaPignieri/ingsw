@@ -32,14 +32,14 @@ class S3StorageServiceTest {
 
     private S3StorageService s3StorageService;
 
-    private final String BUCKET_NAME = "test-bucket";
-    private final String REGION = "us-east-1";
+    private final String bucketName = "test-bucket";
+    private final String region = "us-east-1";
 
     @BeforeEach
     void setUp() {
         s3StorageService = new S3StorageService(s3Client);
-        ReflectionTestUtils.setField(s3StorageService, "bucketName", BUCKET_NAME);
-        ReflectionTestUtils.setField(s3StorageService, "region", REGION);
+        ReflectionTestUtils.setField(s3StorageService, "bucketName", bucketName);
+        ReflectionTestUtils.setField(s3StorageService, "region", region);
     }
 
     @Test
@@ -59,10 +59,10 @@ class S3StorageServiceTest {
         verify(s3Client).putObject(putObjectRequestCaptor.capture(), any(RequestBody.class));
 
         PutObjectRequest capturedRequest = putObjectRequestCaptor.getValue();
-        assertEquals(BUCKET_NAME, capturedRequest.bucket());
+        assertEquals(bucketName, capturedRequest.bucket());
         assertTrue(capturedRequest.key().endsWith(".jpg"));
 
-        String expectedUrlStart = "https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/";
+        String expectedUrlStart = "https://" + bucketName + ".s3." + region + ".amazonaws.com/";
         assertTrue(resultUrl.startsWith(expectedUrlStart));
         assertTrue(resultUrl.endsWith(".jpg"));
     }

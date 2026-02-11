@@ -72,8 +72,7 @@ public class UserService {
     }
 
     private void updateAgentFields(User user, UserUpdateRequest request) {
-        if (user instanceof com.dietiestates25.model.Agent) {
-            com.dietiestates25.model.Agent agent = (com.dietiestates25.model.Agent) user;
+        if (user instanceof com.dietiestates25.model.Agent agent) {
             if (request.getBiography() != null) {
                 agent.setBiography(request.getBiography());
             }
@@ -99,8 +98,7 @@ public class UserService {
         dto.setRole(user.getRoles().stream().findFirst().map(Enum::name).orElse("USER"));
         dto.setAuthProvider(user.getAuthProvider());
 
-        if (user instanceof com.dietiestates25.model.Agent) {
-            com.dietiestates25.model.Agent agent = (com.dietiestates25.model.Agent) user;
+        if (user instanceof com.dietiestates25.model.Agent agent) {
             dto.setBiography(agent.getBiography());
             dto.setProfilePhoto(agent.getProfilePhoto());
         }
