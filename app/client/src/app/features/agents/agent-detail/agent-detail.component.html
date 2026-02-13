@@ -57,7 +57,7 @@
         <div class="review-actions">
             <button *ngIf="canPostReview" class="btn-primary" (click)="openReviewModal()">Write a Review</button>
             <div *ngIf="!isLoggedIn" class="login-prompt">
-                <p>Please <a routerLink="/login">log in</a> to leave a review.</p>
+                <p>Please <a routerLink="/auth/login">log in</a> to leave a review.</p>
             </div>
         </div>
 

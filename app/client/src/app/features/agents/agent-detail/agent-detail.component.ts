@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AgentService } from '../../../core/services/agent.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Agent } from '../../../core/models/agent.model';
@@ -12,7 +12,7 @@ import { ReviewFormComponent } from '../components/review-form/review-form.compo
 @Component({
     selector: 'app-agent-detail',
     standalone: true,
-    imports: [CommonModule, PropertyCardComponent, ReviewListComponent, ReviewFormComponent],
+    imports: [CommonModule, PropertyCardComponent, ReviewListComponent, ReviewFormComponent, RouterLink],
     templateUrl: './agent-detail.component.html',
     styleUrls: ['./agent-detail.component.css']
 })
