@@ -1,0 +1,83 @@
+<div class="container page-content" *ngIf="agent; else loadingOrError">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-image">
+            <img [src]="agent.profilePhoto || 'https://placehold.co/200'" [alt]="agent.firstName">
+        </div>
+        <div class="profile-info">
+            <h1>{{ agent.firstName }} {{ agent.lastName }}</h1>
+            <p class="role">Professional Real Estate Agent</p>
+            <div class="meta-info">
+                <span class="badge" *ngIf="agent.agencyName">Agency: {{ agent.agencyName }}</span>
+                <span class="badge">Age: {{ getAge(agent.birthDate) }}</span>
+            </div>
+
+            <div class="contact-info">
+                <p><strong>Email:</strong> <a [href]="'mailto:' + agent.email">{{ agent.email }}</a></p>
+                <p *ngIf="agent.phoneNumber"><strong>Phone:</strong> <a [href]="'tel:' + agent.phoneNumber">{{
+                        agent.phoneNumber }}</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biography -->
+    <div class="section-block bio-section">
+        <h2>About {{ agent.firstName }}</h2>
+        <p>{{ agent.biography || 'No biography available.' }}</p>
+    </div>
+
+    <!-- Properties List -->
+    <div class="section-block properties-section">
+        <h2>Properties by {{ agent.firstName }}</h2>
+        <div class="properties-grid" *ngIf="agent.properties && agent.properties.length > 0; else noProperties">
+            <app-property-card *ngFor="let prop of agent.properties" [property]="prop"></app-property-card>
+        </div>
+        <ng-template #noProperties>
+            <p class="text-muted">No properties listed yet.</p>
+        </ng-template>
+    </div>
+
+    <!-- Reviews -->
+    <div class="section-block reviews-section">
+        <div class="reviews-header-row">
+            <h2>Client Reviews</h2>
+            <div class="average-rating" *ngIf="reviews.length > 0">
+                <span class="avg-score">{{ averageRating | number:'1.1-1' }}</span>
+                <div class="stars">
+                    <span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= averageRating"
+                        [class.half]="star > averageRating && star - 1 < averageRating">
+                        ★
+                    </span>
+                </div>
+                <span class="review-count">({{ reviews.length }} reviews)</span>
+            </div>
+        </div>
+
+        <div class="review-actions">
+            <button *ngIf="canPostReview" class="btn-primary" (click)="openReviewModal()">Write a Review</button>
+            <div *ngIf="!isLoggedIn" class="login-prompt">
+                <p>Please <a routerLink="/login">log in</a> to leave a review.</p>
+            </div>
+        </div>
+
+        <app-review-list [reviews]="reviews"></app-review-list>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" *ngIf="showReviewModal" (click)="closeReviewModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <button class="close-btn" (click)="closeReviewModal()">&times;</button>
+            <app-review-form *ngIf="agent" [agentId]="agent.id" (reviewPosted)="onReviewPosted()">
+            </app-review-form>
+        </div>
+    </div>
+
+</div>
+
+<ng-template #loadingOrError>
+    <div class="container loading-container">
+        <p *ngIf="isLoading">Loading agent profile...</p>
+        <p *ngIf="error" class="error-text">{{ error }}</p>
+    </div>
+</ng-template>

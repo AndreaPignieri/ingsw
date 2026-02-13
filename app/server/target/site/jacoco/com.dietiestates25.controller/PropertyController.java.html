@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dietiestates25</a> &gt; <a href="index.source.html" class="el_package">com.dietiestates25.controller</a> &gt; <span class="el_source">PropertyController.java</span></div><h1>PropertyController.java</h1><pre class="source lang-java linenums">package com.dietiestates25.controller;
+
+import com.dietiestates25.dto.PropertyCreateRequest;
+import com.dietiestates25.dto.PropertyDTO;
+import com.dietiestates25.service.PropertyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
+
+@RestController
+@RequestMapping(&quot;/properties&quot;)
+@RequiredArgsConstructor
+public class PropertyController {
+
+    private final PropertyService propertyService;
+
+    @GetMapping
+    public ResponseEntity&lt;Page&lt;PropertyDTO&gt;&gt; searchProperties(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Integer rooms,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) Integer floor,
+            @RequestParam(required = false) Integer bathrooms,
+            @RequestParam(required = false) String energyClass,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) String agentEmail,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double radius,
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;12&quot;) int limit) {
+
+<span class="fc" id="L41">        var criteria = com.dietiestates25.dto.PropertySearchCriteria.builder()</span>
+<span class="fc" id="L42">                .city(city)</span>
+<span class="fc" id="L43">                .type(type)</span>
+<span class="fc" id="L44">                .minPrice(minPrice)</span>
+<span class="fc" id="L45">                .maxPrice(maxPrice)</span>
+<span class="fc" id="L46">                .rooms(rooms)</span>
+<span class="fc" id="L47">                .minSize(minSize)</span>
+<span class="fc" id="L48">                .maxSize(maxSize)</span>
+<span class="fc" id="L49">                .floor(floor)</span>
+<span class="fc" id="L50">                .bathrooms(bathrooms)</span>
+<span class="fc" id="L51">                .energyClass(energyClass)</span>
+<span class="fc" id="L52">                .condition(condition)</span>
+<span class="fc" id="L53">                .agentEmail(agentEmail)</span>
+<span class="fc" id="L54">                .latitude(latitude)</span>
+<span class="fc" id="L55">                .longitude(longitude)</span>
+<span class="fc" id="L56">                .radius(radius)</span>
+<span class="fc" id="L57">                .build();</span>
+
+<span class="fc" id="L59">        return ResponseEntity</span>
+<span class="fc" id="L60">                .ok(propertyService.searchProperties(criteria, page, limit));</span>
+    }
+
+    @PostMapping
+    @PreAuthorize(&quot;hasAuthority('AGENT')&quot;)
+    public ResponseEntity&lt;PropertyDTO&gt; createProperty(@RequestBody PropertyCreateRequest request,
+            java.security.Principal principal) {
+<span class="nc" id="L67">        return ResponseEntity.status(HttpStatus.CREATED)</span>
+<span class="nc" id="L68">                .body(propertyService.createProperty(request, principal.getName()));</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;PropertyDTO&gt; getProperty(@PathVariable Long id) {
+<span class="nc" id="L73">        return ResponseEntity.ok(propertyService.getProperty(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

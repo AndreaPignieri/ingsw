@@ -1,0 +1,82 @@
+@startuml
+title Backend - Service & Infrastructure Architecture
+
+' Parametri di stile
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam nodesep 20
+skinparam ranksep 20
+skinparam BoxPadding 10
+
+' Definizione Colori Package
+skinparam package {
+    BackgroundColor<<Logic>> HoneyDew
+    BackgroundColor<<Data>> BlanchedAlmond
+}
+
+
+' LIVELLO 2: LOGICA DI BUSINESS
+package "com.dietiestates25.service" <<Logic>> as service {
+    class JwtService {
+        +generateToken(UserDetails) : String
+        +extractUsername(token) : String
+    }
+
+    interface StorageService <<interface>> {
+        +uploadFile(file) : String
+    }
+
+    class LocalStorageService
+    class S3StorageService
+    
+    StorageService <|.. LocalStorageService
+    StorageService <|.. S3StorageService
+
+    class AuthService {
+        +register(RegisterRequest)
+        +registerAgency(AgencyRegisterRequest)
+        +login(LoginRequest) : AuthResponse
+    }
+
+    class PropertyService {
+        +searchProperties(criteria, page, limit) : Page<PropertyDTO>
+        +createProperty(req, agentEmail) : PropertyDTO
+        +getProperty(id) : PropertyDTO
+    }
+
+    class AgentService {
+        +createAgent(req)
+        +getAgents() : List<AgentDTO>
+        +getAgent(id) : AgentDTO
+        +updateAgent(id, req)
+    }
+
+    class AgencyService {
+        +getAgentsByAgency(agencyId) : List<AgentDTO>
+        +getAgentsByManagerEmail(email) : List<AgentDTO>
+    }
+
+    class UserService {
+        +getCurrentUserProfile(email) : UserDTO
+        +updateProfile(req, email)
+    }
+
+    class ReviewService {
+        +getReviewsByAgent(id) : List<ReviewDTO>
+        +createReview(req, userEmail)
+    }
+}
+
+' LIVELLO 3: PERSISTENZA
+package "com.dietiestates25.repository" <<Data>> as repository {
+    interface UserRepository <<interface>>
+    interface AgentRepository <<interface>>
+    interface AgencyRepository <<interface>>
+    interface PropertyRepository <<interface>>
+    interface AmenityRepository <<interface>>
+    interface ReviewRepository <<interface>>
+}
+
+service --> repository
+
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title Package Overview - DietiEstates25
+
+' Parametri estetici
+skinparam style strictuml
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+skinparam BoxPadding 10
+
+' Definizione colori per tipologia
+skinparam package {
+    BackgroundColor<<Web>> AliceBlue
+    BackgroundColor<<Logic>> HoneyDew
+    BackgroundColor<<Data>> BlanchedAlmond
+    BackgroundColor<<Infra>> MistyRose
+}
+
+package "com.dietiestates25.controller" as controller <<Web>>
+package "com.dietiestates25.dto" as dto <<Web>>
+
+package "com.dietiestates25.service" as service <<Logic>>
+package "com.dietiestates25.exception" as exception <<Logic>>
+
+package "com.dietiestates25.repository" as repository <<Data>>
+package "com.dietiestates25.model" as model <<Data>>
+
+package "com.dietiestates25.config" as config <<Infra>>
+package "com.dietiestates25.security" as security <<Infra>>
+
+' Relazioni di dipendenza
+controller --> service
+controller --> dto
+
+service --> repository
+service --> model
+service --> dto
+service --> exception
+
+repository --> model
+
+config --> security
+config --> service
+security --> service
+
+' Note esplicative opzionali
+note bottom of dto : Data Transfer Objects\n(Request/Response)
+note right of model : JPA Entities\n(Database Mapping)
+
+@enduml

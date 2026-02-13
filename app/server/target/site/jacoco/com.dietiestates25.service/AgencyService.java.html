@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AgencyService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dietiestates25</a> &gt; <a href="index.source.html" class="el_package">com.dietiestates25.service</a> &gt; <span class="el_source">AgencyService.java</span></div><h1>AgencyService.java</h1><pre class="source lang-java linenums">package com.dietiestates25.service;
+
+import com.dietiestates25.dto.AgencyCreateRequest;
+import com.dietiestates25.model.Agency;
+import com.dietiestates25.model.Role;
+import com.dietiestates25.model.User;
+import com.dietiestates25.repository.AgencyRepository;
+import com.dietiestates25.repository.UserRepository;
+import com.dietiestates25.exception.ResourceNotFoundException;
+import com.dietiestates25.exception.UserAlreadyExistsException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class AgencyService {
+
+    private final AgencyRepository agencyRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public void createAgency(AgencyCreateRequest request) {
+        // 1. Create Agency
+<span class="fc" id="L27">        Agency agency = new Agency();</span>
+<span class="fc" id="L28">        agency.setName(request.getName());</span>
+<span class="fc" id="L29">        agency.setAddress(request.getAddress());</span>
+<span class="fc" id="L30">        agency.setPhone(request.getPhone());</span>
+<span class="fc" id="L31">        agency.setEmail(request.getEmail());</span>
+
+<span class="fc" id="L33">        agency = agencyRepository.save(agency);</span>
+
+        // 2. Create Manager User
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (userRepository.existsByEmail(request.getManagerEmail())) {</span>
+<span class="fc" id="L37">            throw new UserAlreadyExistsException(&quot;User with email &quot; + request.getManagerEmail() + &quot; already exists&quot;);</span>
+        }
+
+<span class="fc" id="L40">        User manager = new User();</span>
+<span class="fc" id="L41">        manager.setEmail(request.getManagerEmail());</span>
+<span class="fc" id="L42">        manager.setFirstName(request.getManagerFirstName());</span>
+<span class="fc" id="L43">        manager.setLastName(request.getManagerLastName());</span>
+<span class="fc" id="L44">        manager.setPasswordHash(passwordEncoder.encode(request.getManagerPassword()));</span>
+<span class="fc" id="L45">        manager.setAgency(agency);</span>
+<span class="fc" id="L46">        manager.getRoles().add(Role.AGENCY);</span>
+
+<span class="fc" id="L48">        userRepository.save(manager);</span>
+<span class="fc" id="L49">    }</span>
+
+    @Transactional(readOnly = true)
+    public com.dietiestates25.dto.AgencyDTO getAgencyByUser(String email) {
+<span class="fc" id="L53">        User user = userRepository.findByEmail(email)</span>
+<span class="fc" id="L54">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found&quot;));</span>
+
+<span class="fc" id="L56">        Agency agency = user.getAgency();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (agency == null) {</span>
+<span class="fc" id="L58">            throw new ResourceNotFoundException(&quot;User does not belong to an agency&quot;);</span>
+        }
+
+<span class="fc" id="L61">        return mapToDTO(agency);</span>
+    }
+
+    @Transactional
+    public void updateAgency(String email, com.dietiestates25.dto.AgencyUpdateRequest request) {
+<span class="fc" id="L66">        User user = userRepository.findByEmail(email)</span>
+<span class="pc" id="L67">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found&quot;));</span>
+
+<span class="fc" id="L69">        Agency agency = user.getAgency();</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (agency == null) {</span>
+<span class="nc" id="L71">            throw new ResourceNotFoundException(&quot;User does not belong to an agency&quot;);</span>
+        }
+
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (request.getName() != null)</span>
+<span class="fc" id="L75">            agency.setName(request.getName());</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (request.getAddress() != null)</span>
+<span class="nc" id="L77">            agency.setAddress(request.getAddress());</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (request.getPhone() != null)</span>
+<span class="nc" id="L79">            agency.setPhone(request.getPhone());</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (request.getEmail() != null)</span>
+<span class="nc" id="L81">            agency.setEmail(request.getEmail());</span>
+
+<span class="fc" id="L83">        agencyRepository.save(agency);</span>
+<span class="fc" id="L84">    }</span>
+
+    private com.dietiestates25.dto.AgencyDTO mapToDTO(Agency agency) {
+<span class="fc" id="L87">        com.dietiestates25.dto.AgencyDTO dto = new com.dietiestates25.dto.AgencyDTO();</span>
+<span class="fc" id="L88">        dto.setId(agency.getId());</span>
+<span class="fc" id="L89">        dto.setName(agency.getName());</span>
+<span class="fc" id="L90">        dto.setAddress(agency.getAddress());</span>
+<span class="fc" id="L91">        dto.setPhone(agency.getPhone());</span>
+<span class="fc" id="L92">        dto.setEmail(agency.getEmail());</span>
+<span class="fc" id="L93">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

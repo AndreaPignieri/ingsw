@@ -1,0 +1,95 @@
+@startuml
+skinparam style strictuml
+skinparam SequenceMessageAlignment center
+skinparam BoxPadding 10
+
+title UC12 - Inserimento recensione agente
+
+actor "Cliente (utente registrato)" as C
+
+box "Frontend" #AliceBlue
+    participant "AgentDetailComponent\n+ ReviewFormComponent" as FE
+end box
+
+box "Backend" #HoneyDew
+    participant "ReviewController" as RC
+    participant "ReviewService" as RS
+    participant "AgentRepository" as AR
+    participant "UserRepository" as UR
+    participant "ReviewRepository" as RR
+end box
+
+box "Database" #BlanchedAlmond
+    database "DB" as DB
+end box
+
+== Apertura pagina agente ==
+
+C -> FE : Apre pagina dettaglio agente
+activate FE
+FE -> RC : GET /agents/{id}
+note over RC, DB : Caricamento dati agente e recensioni esistenti
+RC --> FE : Dati agente
+deactivate FE
+
+== Inserimento recensione ==
+
+C -> FE : Clic su "Write a review"
+activate FE
+note right of FE : Mostra form (score + comment)
+
+C -> FE : Inserisce dati e clicca "Submit"
+FE -> RC : POST /reviews (JWT + Body)
+activate RC
+
+RC -> RS : createReview(request, email)
+activate RS
+
+RS -> AR : findById(agentId)
+activate AR
+AR -> DB : SELECT * FROM agent
+activate DB
+DB --> AR : Agent
+deactivate DB
+AR --> RS : Agent
+deactivate AR
+
+RS -> UR : findByEmail(email)
+activate UR
+UR -> DB : SELECT * FROM users
+activate DB
+DB --> UR : User
+deactivate DB
+UR --> RS : User
+deactivate UR
+
+RS -> RS : Crea entità Review\n(mapping dati)
+
+RS -> RR : save(review)
+activate RR
+RR -> DB : INSERT INTO agent_reviews
+activate DB
+DB --> RR : Review ID
+deactivate DB
+RR --> RS : Review Entity
+deactivate RR
+
+RS --> RC : ReviewDTO
+deactivate RS
+
+RC --> FE : 201 Created + ReviewDTO
+deactivate RC
+
+note right of FE : Aggiorna lista recensioni\nlocalmente
+FE --> C : Conferma inserimento
+deactivate FE
+
+== Errori possibili ==
+
+RS -[#red]> RC : Eccezione (Validazione/Not Found)
+activate RC
+RC -[#red]> FE : 4xx Response
+deactivate RC
+FE -[#red]> C : Mostra alert errore
+
+@enduml
