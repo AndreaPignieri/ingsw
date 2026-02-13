@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.dietiestates25.service.ReviewServiceTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.091 s -- in com.dietiestates25.service.ReviewServiceTest
