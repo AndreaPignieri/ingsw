@@ -55,13 +55,8 @@ Lo stato attuale dell’implementazione copre:
   \item Login/registrazione con provider esterni (Google, Facebook, GitHub).
 \end{itemize}
 
-Funzionalità previste dal capitolato ma \textbf{non ancora implementate} (o pianificate come estensione futura):
 
-\begin{itemize}[nosep]
-  \item Prenotazione visite agli immobili con agenda condivisa.
-  \item Gestione di offerte di acquisto/affitto (workflow proposta/controproposta).
-  \item Tipologie dedicate per affitti brevi / case vacanze.
-\end{itemize}
+\pagebreak
 
 \section{Glossario}
 
@@ -184,7 +179,6 @@ Assunta ha 40 anni, lavora come agente immobiliare da oltre 15 anni in un'agenzi
   \item Pubblicare rapidamente nuovi immobili con foto e dettagli completi.
   \item Dare un'immagine professionale tramite profilo con foto e biografia.
   \item Ricevere recensioni positive dai clienti per aumentare la credibilità.
-  \item Monitorare le performance degli annunci pubblicati.
 \end{itemize}
 
 \textbf{Motivazioni:}\\
@@ -288,7 +282,7 @@ I casi d'uso sopra elencati sono modellati tramite Use Case Diagram UML:
 \section{Requisiti funzionali}
 
 \begin{itemize}[nosep]
-  \item \textbf{RF-01 -- Registrazione utente cliente}\\
+  \item \textbf{RF-01 -- Registrazione utente}\\
   Un utente può registrarsi con e-mail e password (endpoint \texttt{/auth/register}).
 
   \item \textbf{RF-02 -- Registrazione agenzia + manager}\\
@@ -361,8 +355,10 @@ I casi d'uso sopra elencati sono modellati tramite Use Case Diagram UML:
   \item Ogni immobile è associato a un agente, un’agenzia, servizi (amenities), foto e ad una posizione geografica (punto).
   \item Gli utenti possono avere più ruoli; agenti e manager sono associati a un’agenzia.
   \item Le recensioni sono legate a un singolo agente e, opzionalmente, a un utente cliente.
+
 \end{itemize}
 
+\pagebreak
 
 \section{MockUp dei casi d'uso}
 Di seguito sono riportati i mock up per i casi di uso e le loro estensioni.
@@ -742,8 +738,8 @@ Il sistema è pensato per un deployment su infrastruttura cloud, con particolare
 Il back-end \textbf{Spring Boot} è eseguito su una \textbf{Virtual Machine AWS} (es. istanza EC2) che ospita anche il database \textbf{PostgreSQL/PostGIS} utilizzato in produzione. In questo scenario:
 
 \begin{itemize}[nosep]
-  \item l'applicazione Spring Boot è deployata come \texttt{jar} eseguibile (o container Docker) sulla VM;
-  \item PostgreSQL/PostGIS è installato e configurato sulla stessa VM, con accesso limitato tramite regole di sicurezza (security group, firewall);
+  \item \textbf{L'applicazione Spring Boot} è deployata come container Docker sulla VM, garantendo l'isolamento dell'ambiente di esecuzione e la coerenza tra sviluppo e produzione.
+  \item \textbf{PostgreSQL/PostGIS} è eseguito come container Docker sulla stessa VM. Questa scelta semplifica la gestione delle estensioni spaziali e facilita le operazioni di backup e aggiornamento.
   \item l'applicazione accede al database tramite credenziali configurate in variabili d'ambiente o file di configurazione esterni.
 \end{itemize}
 
